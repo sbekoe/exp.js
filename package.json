@@ -1,0 +1,37 @@
+{
+    "name": "exp",
+    "title": "exp.js",
+    "version": "0.1.0",
+    "description": "RegExp library based on underscore js",
+    "homepage": "https://github.com/sbekoe/exp.js",
+    "author": {
+      "name": "Simon Bekoe",
+      "email": "simon@bekoe.net"
+    },
+    "keywords": [
+        "RegExp",
+        "Regular Expression",
+        "underscore",
+        "string"
+    ],
+    "main": "./exp.js",
+    "include": [
+        "README.md"
+    ],
+    "engines": {
+        "node": "*"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sbekoe/exp.js.git"
+    },
+    "dependencies":{
+        "underscore": "1.4.3"
+    },
+    "bugs": {
+        "url": "https://github.com/sbekoe/exp.js/issues"
+    },
+    "licenses" : [
+        { "type" : "MIT" }
+    ]
+}

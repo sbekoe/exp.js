@@ -1,7 +1,3 @@
-/*! exp.js - v0.0.0 - 2013-01-27
- * https://github.com/sbekoe/exp.js
- * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
-
 (function (root, factory) {
 
   if (typeof exports === 'object') {
@@ -49,7 +45,7 @@
     this.initialize(exp, options);
   };
 
-  Exp.VERSION = '0.0.0';
+  Exp.VERSION = '@@version';
 
 	Exp.prototype = {
     initialize: function(exp, options){
