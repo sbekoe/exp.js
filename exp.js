@@ -1,4 +1,4 @@
-/*! exp.js - v0.0.0 - 2013-01-27
+/*! exp.js - v0.1.0 - 2013-01-27
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
 
@@ -49,7 +49,7 @@
     this.initialize(exp, options);
   };
 
-  Exp.VERSION = '0.0.0';
+  Exp.VERSION = '0.1.0';
 
 	Exp.prototype = {
     initialize: function(exp, options){
