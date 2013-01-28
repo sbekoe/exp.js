@@ -170,7 +170,7 @@ test("scanning, mapping and skipping",function(){
       return match.capture('tag.id') == 'skip'? Exp.skipper : 'tagname: '+ match.capture('tag.name') + ', id: ' + match.capture('tag.id') + ', content: ' + match.capture('tag.content');
     });
 
-  deepEqual(tokens,[
+  deepEqual(tokens.value(),[
     "tagname: div, id: header, content:  header text",
     "tagname: div, id: content, content: content text",
     "tagname: div, id: footer, content: footer text"
@@ -185,7 +185,7 @@ test('parsing & replacing',function(){
     mapper = function(match, tokens){ return data[match.capture('key')] || match.match},
     res = exp.parse(tpl, mapper);
 
-  deepEqual(res, ['Hi, my name is ', 'Ted', '!'], 'parse with functional mapper');
+  deepEqual(res.value(), ['Hi, my name is ', 'Ted', '!'], 'parse with functional mapper');
 
   var
     e = Exp(/(#firstname:\w+)\s+(#lastname:\w+)/),
@@ -237,7 +237,7 @@ test('assignments',function(){
   deepEqual(
     exp.scan('Homer, Marge, Bart, Lisa, Maggie',function(match){
       return {age: match.assignment('age'), gender: match.assignment('gender')};
-    }),
+    }).value(),
     [
       {age:42, gender:'m'},
       {age:34, gender:'w'},

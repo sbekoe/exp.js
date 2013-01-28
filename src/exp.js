@@ -248,21 +248,6 @@
 			}
 		}
 	};
-  var
-    getMapper = Exp.getMapper = function(mapper){
-      var m, tokens, indices = {};
-      if (typeof mapper !== 'string') return mapper || _.identity;
-
-    tokens = parse(MARKER, mapper, function(m, t){
-      indices[t.length] = m[1];
-    });
-
-    return function(match){
-      for(var i in indices)
-        tokens[i] = indices[i] === '&'? match[0] : match.get? match.get(indices[i]) : match[indices[i]];
-      return tokens.join('');
-    };
-  };
 
 
 	var
@@ -278,7 +263,7 @@
         if(!exp.global) break;
       }
 
-      return tokens;
+      return _.extend(_(tokens),tokens, {length: tokens.length});
     },
 
     // return the first match in a string that is not the sipper obj
@@ -437,10 +422,29 @@
 	// helper
 	var
     sSlice = String.prototype.slice,
+
     aSlice = Array.prototype.slice,
+
     aPush = Array.prototype.push,
-		byLength = function(a,b){ return b.length - a.length;},
-		findClosedReplacement = function (string){
+
+    byLength = function(a,b){ return b.length - a.length;},
+
+    getMapper = Exp.getMapper = function(mapper){
+      var m, tokens, indices = {};
+      if (typeof mapper !== 'string') return mapper || _.identity;
+
+      tokens = parse(MARKER, mapper, function(m, t){
+        indices[t.length] = m[1];
+      }).value();
+
+      return function(match){
+        for(var i in indices)
+          tokens[i] = indices[i] === '&'? match[0] : match.get? match.get(indices[i]) : match[indices[i]];
+        return tokens.join('');
+      };
+    },
+
+    findClosedReplacement = function (string){
 			var opener = 1;
 			return Exp.search(/\(|\)|\\\(|\\\)/g, string, function(match){
 				if(match[0] === '('){opener++;}
@@ -451,7 +455,7 @@
 
     resolvePath = function(path, obj, delimitter){
       delimitter = delimitter || '.';
-      obj = obj || window; // TODO: remove the window alternative
+      obj = obj || window;
       if(obj[path]) return obj[path];
       path = (path + '').split(delimitter);
       try{ return eval('(obj["' + path.join('"]["') + '"])'); }
