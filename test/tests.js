@@ -360,6 +360,15 @@ test('repetitions', function(){
     ['0','1','2','3'],
     'separated repetitions'
   );
+
+  e = Exp(/#number{0,,,\s}/,{
+    captureRepetition: true,
+    wildcards:{
+      'number': /\d/
+    }
+  });
+  m = e.exec('0, 1, 2, 3');
+  ok(m == '0, 1, 2, 3');
 });
 //test('escaping Exp.esc',function(){});
 //test('expanding external source string Exp.expand',function(){});

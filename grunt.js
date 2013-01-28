@@ -82,6 +82,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-replace');
   // Default task.
   grunt.registerTask('default', 'lint qunit concat min replace');
-  //grunt.registerTask('replace', 'replace');
+  grunt.registerTask('travis', 'lint qunit');
 
 };
