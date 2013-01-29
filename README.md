@@ -8,19 +8,20 @@ Regular expressions object oriented.
 exp.js makes building complex regular expressions easy and keeps them maintainable.
 
 ## Features
-- provides native api: `.exec()`, `.tets()`, `.compile()`, `.global`, `.ignoreCase`, `.multiline`, `.source`, `.lastIndex` and `.lastMatch`
+- provides native api: `.exec()`, `.test()`, `.compile()`, `.global`, `.ignoreCase`, `.multiline`, `.source`, `.lastIndex` and `.lastMatch`
 - comes with additional methods: `.scan()`, `.search()`, `.parse()`, `.replace()`
 - named captures: inline style `/(#name:\w+)/` or with wildcards `/#name/`
 - injections: `/%name/` represents an epression part which will be wrapped in non-capturing parenthesis
 - lists: the seperator `[\s]` in the quantifier of `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`
-- assignments: `/(\w+)>data.attr/` allows data binding to captures diffrent from `undefined`
-- and some more
+- assignments: `/(\w+)>data.attr/` allows data binding to captures differing from `undefined`
+- and some more utilities
 
 ## Dependencies
 - underscore
 
 ## Installation
-- `$ npm install exp`
+exp.js is also available from npm: `$ npm install exp`
+
 
 
 A small showcase is available on [jsfiddle](http://jsfiddle.net/eokeb/rFgdY/8/).
