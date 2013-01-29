@@ -43,7 +43,7 @@ var exp = Exp({
 ## Mapper<a id="mapper"/>
 ## Methods<a id="methods"/>
 ### .exec(string)<a id="exec"/>
-*Returns a  [Match](#match)*
+*Returns a  [`Match`](#match) or `null`*
 ```javascript
 var exp = Exp(/(#word:\w+)/g);
 var match  = exp.exec('ABC DEF');
