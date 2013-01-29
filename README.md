@@ -57,25 +57,25 @@ match.index; // 0
 exp.lastIndex; // 3
 ```
 
-### .test(*string*)<a id="test"/>
+### .test(string)<a id="test"/>
 *Returns a boolean whether the epression matched or not*
 
-### .scan(*string[,[mapper](#mapper)]*)<a id="scan"/>
+### .scan(string [,[mapper](#mapper)])<a id="scan"/>
 *Returns an underscore wrapped array containing all matches  if the global falg is set and a single match or empty list elswise.*
 ```javascript
 ```
 
-### .search(*string[,[mapper](#mapper)]*)<a id="search"/>
+### .search(string [,[mapper](#mapper)])<a id="search"/>
 *Returns*
 ```javascript
 ```
 
-### .parse(*string[,[mapper](#mapper)]*)<a id="parse"/>
+### .parse(string [,[mapper](#mapper)])<a id="parse"/>
 *Returns*
 ```javascript
 ```
 
-### .replace(*string[,[mapper](#mapper)]*)<a id="repace"/>
+### .replace(string [,[mapper](#mapper)])<a id="repace"/>
 *Returns*
 ```javascript
 ```
