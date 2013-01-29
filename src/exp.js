@@ -314,7 +314,7 @@
     skipper = Exp.skipper = {},
 
     esc = Exp.esc = function(string, nativeCharsOnly){
-      !_.isArray(string) || (string = string.join(''));
+      if(_.isArray(string)) string = string.join('');
       return string.replace(new RegExp('[\\-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\\^\\$\\|' + (nativeCharsOnly? '' : '%#') +']','g'), "\\$&");
     };
 
@@ -343,7 +343,7 @@
           r = this._exp._captures[i].r,
           c = this._match[i];
 
-        return !r? c : Exp({
+        return !r? c : new Exp({
           source: sSlice.apply(this._exp._exp.source, r.expBound),
           captures: [{}].concat(aSlice.apply(this._exp._captures, r.capBound)),
           indices: this._exp.indices,
