@@ -7,18 +7,34 @@ Regular expressions object oriented.
 
 exp.js makes building complex regular expressions easy and keeps them maintainable.
 
+**Note:** exp.js is still in beta phase. So its API may change frequently. !!!
+
 ## Features
-- provides native api: `.exec()`, `.test()`, `.compile()`, `.global`, `.ignoreCase`, `.multiline`, `.source`, `.lastIndex` and `.lastMatch`
-- comes with additional methods: `.scan()`, `.search()`, `.parse()`, `.replace()`
-- additional attributes: `.lastRange`
-- named captures: inline style `/(#name:\w+)/` or with wildcards `/#name/`
-- injections: `/%name/` represents an epression part which will be wrapped in non-capturing parenthesis
-- lists: the seperator `[\s]` in the quantifier of `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`
-- assignments: `/(\w+)>data.attr/` allows data binding to captures differing from `undefined`
+- provides native api:
+    - `.exec()`,
+    - `.test()`,
+    - `.compile()`,
+    - `.global`,
+    - `.ignoreCase`,
+    - `.multiline`,
+    - `.source`,
+    - `.lastIndex`
+    - `.lastMatch`
+- comes with additional methods:
+    - [`.scan()`](#scan),
+    - [`.search()`](#search),
+    - [`.parse()`](#parse),
+    - [`.replace()`](#replace)
+- additional attributes:
+    - `.lastRange`
+- [named captures](#named-captures): inline style `/(#name:\w+)/` or with wildcards `/#name/`
+- [injections](#injections): `/%name/` represents an epression part which will be wrapped in non-capturing parenthesis
+- [lists](#lists): the seperator `[\s]` in the quantifier of `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`
+- [assignments](#assignments): `/(\w+)>data.attr/` allows data binding to captures differing from `undefined`
 - and some more utilities
 
 ## Dependencies
-- underscore
+- [underscore](http://underscorejs.org)
 
 ## Installation
 exp.js is also available from npm: `$ npm install exp`
@@ -36,12 +52,37 @@ var exp = Exp({
 });
 ```
 
-## Match<a id="match"/>
+## Match
+In exp.js [`.exec()`](#exec) returns an instance of the `Match` class which inhertis all the good stuff from [underscore](http://underscorejs.org) and wraps the native match array.
+For backward compatibility all attributes of the native match are accessable as usual.
+The match object ptovides some further methods and attributes to access captures by name etc.
+
+### .capture([path](#path)), .cap([path](#path))<a id="capture" /><a id="cap" />
+Gets the first named captures by name or path if they are nested. If the path string is wrapped in an array, all captuers matching the path will be returned.
 ```javascript
+var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
+var match = exp.exec('Hi Bill!');
+
+match.capture('sentence') // 'Hi Bill!'
+match.capture('word') // 'Hi'
+match.capture('sentence.word') // 'Hi'
+match.capture(['word']) // ['Hi','Bill']
 ```
 
-## Mapper<a id="mapper"/>
-## Methods<a id="methods"/>
+### .attachment([path](#path)), .at([path](#path))<a id="attachment" /><a id="at" />
+Gets an attached object by path. If the path does not point to anything `undefined` will be returned.
+```javascript
+var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
+var match = exp.exec('Hi Bill!');
+
+match.capture('sentence') // 'Hi Bill!'
+match.capture('word') // 'Hi'
+match.capture('sentence.word') // 'Hi'
+match.capture(['word']) // ['Hi','Bill']
+```
+
+## Mapper
+## Methods
 ### .exec(string)<a id="exec"/>
 *Returns a  [`Match`](#match) or `null`*
 ```javascript

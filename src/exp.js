@@ -356,6 +356,7 @@
       .value();
   };
 
+  // The Match class
   var Match = Exp.Match = function(match, exp){
     if (match instanceof Match) return Match;
     if (!(this instanceof Match)) return new Match(match, exp);
@@ -381,42 +382,42 @@
       return value;
   };
 
-  Match.prototype = _.extend(_([]),{
-    capture: function(path){
+  var m_proto = Match.prototype = _([]);
+
+  m_proto.cap = m_proto.capture = function(path){
+    var
+      a = _.isArray(path),
+      c = this._getCaptures(a? path[0] : path);
+
+    return result(this, a? c : c[0]);
+  };
+
+
+  m_proto.at = m_proto.assignment = function(path){
+    var a = this._assignments || (this._assignments = this._getAssignments());
+    return path? resolvePath(path, a) : a;
+  };
+
+  m_proto.get = function(path){ return this.capture(path) || this.assignment(path) || this[path]; } ;
+
+  m_proto.toString = function(){ return this._match[0]; };
+
+  m_proto._getAssignments = function(){
+    return _.reduce(this._match, function(res, cap, i){
       var
-        a = _.isArray(path),
-        c = this._getCaptures(a? path[0] : path);
+        c = this._exp._captures[i],
+        path,
+        assignment,
+        a;
+      if(cap === undefined || !c.a) return res;
+      assignment = resolvePath(c.a.path, this._exp.assignments);
+      assignment = assignment[cap] || assignment;
+      for(a in assignment)
+        if(c.a.force || res[a] === undefined) res[a] = assignment[a];
 
-      return result(this, a? c : c[0]);
-    },
-
-
-    assignment: function(path){
-      var a = this._assignments || (this._assignments = this._getAssignments());
-      return path? resolvePath(path, a) : a;
-    },
-
-    get: function(path){ return this.capture(path) || this.assignment(path) || this[path]; } ,
-
-    toString: function(){ return this._match[0]; },
-
-    _getAssignments: function(){
-      return _.reduce(this._match, function(res, cap, i){
-        var
-          c = this._exp._captures[i],
-          path,
-          assignment,
-          a;
-        if(cap === undefined || !c.a) return res;
-        assignment = resolvePath(c.a.path, this._exp.assignments);
-        assignment = assignment[cap] || assignment;
-        for(a in assignment)
-          if(c.a.force || res[a] === undefined) res[a] = assignment[a];
-
-        return res;
-      },{},this);
-    }
-  });
+      return res;
+    },{},this);
+  };
 
 
 	// helper
