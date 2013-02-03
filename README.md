@@ -35,7 +35,7 @@ exp.js makes building complex regular expressions easy and keeps them maintainab
 - Useful Utilities
 
 ## Dependencies
-- [underscore](http://underscorejs.org)
+- With keeping the size in mind, [underscore](http://underscorejs.org) is deeply intergrated into exp.js.
 
 ## Installation
 exp.js is also available from npm: `$ npm install exp`
