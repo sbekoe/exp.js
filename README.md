@@ -20,18 +20,19 @@ exp.js makes building complex regular expressions easy and keeps them maintainab
     - `.source`,
     - `.lastIndex`
     - `.lastMatch`
-- comes with additional methods:
-    - [`.scan()`](#scan),
-    - [`.search()`](#search),
-    - [`.parse()`](#parse),
-    - [`.replace()`](#replace)
-- additional attributes:
-    - `.lastRange`
-- [named captures](#named-captures): inline style `/(#name:\w+)/` or with wildcards `/#name/`
-- [injections](#injections): `/%name/` represents an epression part which will be wrapped in non-capturing parenthesis
-- [lists](#lists): the seperator `[\s]` in the quantifier of `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`
-- [assignments](#assignments): `/(\w+)>data.attr/` allows data binding to captures differing from `undefined`
-- and some more utilities
+- Extended Syntax:
+    - [Named Captures](#named-captures): inline style `/(#name:\w+)/` or with wildcards `/#name/`
+    - [Injections](#injections): `/%name/` represents an epression part which will be wrapped in non-capturing parenthesis
+    - [Lists](#lists): the seperator `[\s]` in the quantifier of `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`
+    - [Attachments](#assignments): `/(\w+)>data.attr/` allows data binding to captures differing from `undefined`
+- Additional Methods:
+    - [`.scan()`](#scanstring-mapper),
+    - [`.search()`](#searchstring-mapper),
+    - [`.parse()`](#parsestring-mapper),
+    - [`.replace()`](#replacestring-mapper)
+- Additional Attributes:
+    - [`.lastRange`](#lastrange)
+- Useful Utilities
 
 ## Dependencies
 - [underscore](http://underscorejs.org)
@@ -51,6 +52,12 @@ var exp = Exp({
   global: true
 });
 ```
+
+## Syntax
+### Named Captures
+### Injections
+### Lists
+### Attachments
 
 ## Match
 In exp.js [`.exec()`](#exec) returns an instance of the `Match` class which inhertis all the good stuff from [underscore](http://underscorejs.org) and wraps the native match array.
@@ -82,6 +89,9 @@ match.capture(['word']) // ['Hi','Bill']
 ```
 
 ## Mapper
+
+## Path
+
 ## Methods
 ### .exec(string)<a id="exec"/>
 *Returns a  [`Match`](#match) or `null`*
