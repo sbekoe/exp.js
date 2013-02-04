@@ -21,15 +21,15 @@ exp.js makes building complex regular expressions easy and keeps them maintainab
     - `.lastIndex`
     - `.lastMatch`
 - Extended Syntax:
-    - [Named Captures](#named-captures): inline style `/(#name:\w+)/` or with wildcards `/#name/`
-    - [Injections](#injections): `/%name/` represents an epression part which will be wrapped in non-capturing parenthesis
-    - [Lists](#lists): the seperator `[\s]` in the quantifier of `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`
-    - [Attachments](#assignments): `/(\w+)>data.attr/` allows data binding to captures differing from `undefined`
+    - [Named Captures](#named-captures) can be defined inline style `/(#name:\w+)/` or by placeholder `/#name/`.
+    - [Injections](#injections) allow the use of placeholder such in `/%name/` and represent an expression part (definded in the options) which will be wrapped in non-capturing parenthesis.
+    - [Lists](#lists) can be defined by a seperator as the third param of a quantifier. E.g.  `[\s]` in `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`.
+    - [Attachments](#assignments) - `/(\w+)>data.attr/` - allows binding of data on the match obj by captures that differ from `undefined`.
 - Additional Methods:
-    - [`.scan()`](#scanstring-mapper),
-    - [`.search()`](#searchstring-mapper),
-    - [`.parse()`](#parsestring-mapper),
-    - [`.replace()`](#replacestring-mapper)
+    - [Scanning](#scanstring-mapper) `.scan()` fetches all matches at once and returns them in an array.
+    - [Searching](#searchstring-mapper) `.search()`returns the first match that passed the [mapping function](#mapper). 
+    - [Parsing](#parsestring-mapper) `.parse()` returns all tokens in form of an array containing strings & matches alternately.
+    - [Replacing](#replacestring-mapper) `.replace()` returns the the source string with all matches replace by the [mapper](#mapper).
 - Additional Attributes:
     - [`.lastRange`](#lastrange)
 - Useful Utilities
@@ -65,7 +65,7 @@ For backward compatibility all attributes of the native match are accessable as 
 The match object ptovides some further methods and attributes to access captures by name etc.
 
 ### .capture([path](#path)), .cap([path](#path))<a id="capture" /><a id="cap" />
-Gets the first named captures by name or path if they are nested. If the path string is wrapped in an array, all captuers matching the path will be returned.
+*Gets the first named captures by name or path if they are nested. If the path string is wrapped in an array, all captuers matching the path will be returned.*
 ```javascript
 var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
 var match = exp.exec('Hi Bill!');
@@ -76,8 +76,8 @@ match.capture('sentence.word') // 'Hi'
 match.capture(['word']) // ['Hi','Bill']
 ```
 
-### .attachment([path](#path)), .at([path](#path))<a id="attachment" /><a id="at" />
-Gets an attached object by path. If the path does not point to anything `undefined` will be returned.
+### .attachment([path](#path)), .atm([path](#path))<a id="attachment" /><a id="at" />
+*Gets an attached object by path. If the path does not point to anything `undefined` will be returned.*
 ```javascript
 var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
 var match = exp.exec('Hi Bill!');
@@ -108,17 +108,26 @@ match.index; // 0
 exp.lastIndex; // 3
 ```
 
+returns all tokens in form of an array containing strings & matches alternately.
+returns the the source string with all matches replace by the [mapper](#mapper).
+    
 ### .test(string)<a id="test"/>
 *Returns a boolean whether the epression matched or not*
 
 ### .scan(string [,[mapper](#mapper)])<a id="scan"/>
-*Returns an underscore wrapped array containing all matches  if the global falg is set and a single match or empty list elswise.*
+*Returns an underscore wrapped array containing all matches  if the global flag is set and a single match or empty list elswise.*
 ```javascript
 ```
 
 ### .search(string [,[mapper](#mapper)])<a id="search"/>
-*Returns*
+*Returns the first match that passed the [mapper](#mapper).*
 ```javascript
+var exp = Exp(/(#name:\w+ \w+)/);
+var res = exp.exec('Bill Power, Bob Dalton, Grat Dalton, Dick Broadwell', function(match){
+    return match[0][0] === 'B'? this.skip : match;
+});
+
+res.capture('name'); // 'Grat Dalton'
 ```
 
 ### .parse(string [,[mapper](#mapper)])<a id="parse"/>
