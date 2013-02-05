@@ -45,7 +45,7 @@ The `Exp` constructor exprects at leats one argument: a configuration object hol
 ```javascript
 var exp = new Exp(/\w+/g); // object-oriented
 
-var exp = Exp(/\w+/g); // as well as functional
+var exp = Exp(/\w+/g); // functional
 
 var exp = Exp({
   source: '\\w+'
@@ -87,8 +87,13 @@ match.capture('word') // 'Hi'
 match.capture('sentence.word') // 'Hi'
 match.capture(['word']) // ['Hi','Bill']
 ```
+### .get([path](#path))
+*Is a shorthand for `match.capture(path) || match.attachment(path)`.*
 
 ## Mapper
+Some methods, like [`.scan()`](#scanstring-mapper), accept a mapper as second argument.
+The mapper can be a function or string.
+Placeholders prefixed with the `$` character will be replaced by calling [`match.get(path)`](#getpath), similar to `String.prototype.replace`.
 
 ## Path
 
