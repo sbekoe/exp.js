@@ -1,13 +1,14 @@
+[![Build Status](https://travis-ci.org/sbekoe/exp.js.png)](https://travis-ci.org/sbekoe/exp.js)
+
+
 exp.js
 ======
 
-Regular expressions object oriented.
-
-[![Build Status](https://travis-ci.org/sbekoe/exp.js.png)](https://travis-ci.org/sbekoe/exp.js)
-
-exp.js makes building complex regular expressions easy and keeps them maintainable.
+*exp.js makes building complex regular expressions easy and keeps them maintainable.*
 
 **Note:** exp.js is still in beta phase. So its API may change frequently. !!!
+
+A small showcase is available on [jsfiddle](http://jsfiddle.net/eokeb/rFgdY/8/).
 
 ## Features
 - provides native api:
@@ -59,44 +60,6 @@ var exp = Exp({
 ### Lists
 ### Attachments
 
-## Match
-In exp.js [`.exec()`](#exec) returns an instance of the `Match` class which inhertis all the good stuff from [underscore](http://underscorejs.org) and wraps the native match array.
-For backward compatibility all attributes of the native match are accessable as usual.
-The match object ptovides some further methods and attributes to access captures by name etc.
-
-### .capture([path](#path)), .cap([path](#path))<a id="capture" /><a id="cap" />
-*Gets the first named captures by name or path if they are nested. If the path string is wrapped in an array, all captuers matching the path will be returned.*
-```javascript
-var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
-var match = exp.exec('Hi Bill!');
-
-match.capture('sentence') // 'Hi Bill!'
-match.capture('word') // 'Hi'
-match.capture('sentence.word') // 'Hi'
-match.capture(['word']) // ['Hi','Bill']
-```
-
-### .attachment([path](#path)), .atm([path](#path))<a id="attachment" /><a id="at" />
-*Gets an attached object by path. If the path does not point to anything `undefined` will be returned.*
-```javascript
-var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
-var match = exp.exec('Hi Bill!');
-
-match.capture('sentence') // 'Hi Bill!'
-match.capture('word') // 'Hi'
-match.capture('sentence.word') // 'Hi'
-match.capture(['word']) // ['Hi','Bill']
-```
-### .get([path](#path))
-*Is a shorthand for `match.capture(path) || match.attachment(path)`.*
-
-## Mapper
-Some methods, like [`.scan()`](#scanstring-mapper), accept a mapper as second argument.
-The mapper can be a function or string.
-Placeholders prefixed with the `$` character will be replaced by calling [`match.get(path)`](#getpath), similar to `String.prototype.replace`.
-
-## Path
-
 ## Methods
 ### .exec(string)<a id="exec"/>
 *Returns a  [`Match`](#match) or `null`*
@@ -144,4 +107,41 @@ res.capture('name'); // 'Grat Dalton'
 *Returns*
 ```javascript
 ```
-A small showcase is available on [jsfiddle](http://jsfiddle.net/eokeb/rFgdY/8/).
+
+## Match
+In exp.js [`.exec()`](#exec) returns an instance of the `Match` class which inhertis all the good stuff from [underscore](http://underscorejs.org) and wraps the native match array.
+For backward compatibility all attributes of the native match are accessable as usual.
+The match object provides some further methods and attributes to access captures by name etc.
+
+### .capture([path](#path)), .cap([path](#path))<a id="capture" /><a id="cap" />
+*Gets the first named captures by name or path if they are nested. If the path string is wrapped in an array, all captuers matching the path will be returned.*
+```javascript
+var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
+var match = exp.exec('Hi Bill!');
+
+match.capture('sentence') // 'Hi Bill!'
+match.capture('word') // 'Hi'
+match.capture('sentence.word') // 'Hi'
+match.capture(['word']) // ['Hi','Bill']
+```
+
+### .attachment([path](#path)), .atm([path](#path))<a id="attachment" /><a id="at" />
+*Gets an attached object by path. If the path does not point to anything `undefined` will be returned.*
+```javascript
+var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
+var match = exp.exec('Hi Bill!');
+
+match.capture('sentence') // 'Hi Bill!'
+match.capture('word') // 'Hi'
+match.capture('sentence.word') // 'Hi'
+match.capture(['word']) // ['Hi','Bill']
+```
+### .get([path](#path))
+*Is a shorthand for `match.capture(path) || match.attachment(path) || match[path]`.*
+
+## Mapper
+Some methods, like [`.scan()`](#scanstring-mapper), accept a mapper as second argument.
+The mapper can be a function or string.
+Placeholders prefixed with the `$` character will be replaced by calling [`match.get(path)`](#getpath), similar to `String.prototype.replace`.
+
+## Path
