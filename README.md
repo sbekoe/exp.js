@@ -42,7 +42,7 @@ A small showcase is available on [jsfiddle](http://jsfiddle.net/eokeb/rFgdY/8/).
 exp.js is also available from npm: `$ npm install exp`
 
 ## Instanciation
-The `Exp` constructor exprects at leats one argument: a configuration object holding the source attribute or alternatively a native RegExp object passed first and optionally a config obj following.
+The `Exp` constructor expects at leats one argument: a configuration object holding the source attribute or alternatively a native RegExp object passed first and optionally a config obj following.
 ```javascript
 var exp = new Exp(/\w+/g); // object-oriented
 
