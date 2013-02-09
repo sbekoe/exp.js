@@ -22,8 +22,12 @@ A small showcase is available on [jsfiddle](http://jsfiddle.net/eokeb/rFgdY/8/).
     - [Parsing](#parsestring-mapper) `.parse()` returns all tokens in form of an array containing strings & matches alternately.
     - [Replacing](#replacestring-mapper) `.replace()` returns the the source string with all matches replace by the [mapper](#mapper).
 - Additional Attributes:
-    - [`.lastRange`](#lastrange)
+    - [Range](#lastrange) `.range` is an array containg the start- and end indeces of the matched substring.  
+    - [Last range](#lastrange) `.lastRange` is the range of the last match.
 - Useful Utilities
+    - [Match](#match) is Class that mims and extends the native match object.
+    - [Escaping](#esc) characaters reseved in regular expression can be done by `Exp.esc()`.
+    - Scanning, Searching, Parsing and Replacing with native RegExp objects: `Exp.scan(RegExp, string [,mapper])` ...
 - Native API:
     - `.exec()`,
       `.test()`,
