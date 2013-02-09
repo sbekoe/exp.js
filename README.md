@@ -162,7 +162,7 @@ Replaces each match with the specified string in which the `$`-prefixed placehol
 Possible placehoders are:
   - Substitute the n-th capture for `$n` where *n* is a number. 
   - Substitute the matched substring for `$&`.
-  - Substitute the substring that preceds the match for `$\``.
+  - Substitute the substring that preceds the match for ``$` ``.
   - Substitute the substring that follows the match for `$'`.
   - Substitute a named capture or assignment for `$p` where *p* is a [path](#path).
   - Substitute an attribute of the match object fot `$k` where *k* is the attributes key.
