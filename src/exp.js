@@ -26,7 +26,10 @@
 		PATH_DELIMITER = '.',
 		DEBUG_MODE = true,
     SPLITTER = /,|\s+/,
-    PARENTHESIS = /(\\\(|\(\?[:=!])|\((?:#\w+:)?/g;
+    PARENTHESIS = /(\\\(|\(\?[:=!])|\((?:#\w+:)?/g,
+
+    BREAK = {},
+    SKIP = {};
 
   // default expessions settings
   var
@@ -89,7 +92,7 @@
 				names.push(w);
 			}}
 			this._captures = settings.captures || [{path:'', name:''}];
-      this.indices = settings.indices || {path:{}, name:{}};
+      this.indices = settings.indices || {path:{}, name:{}, list:{}};
       this.offset = settings.offset || 0;
 			this._escaped = escaped;
 			this._needle = new RegExp(
@@ -118,6 +121,7 @@
 				escaped = this._escaped,
         iName = this.indices.name,
         iPath = this.indices.path,
+        iList = this.indices.list,
 
 				// The namespace is a stack containing the keywords of the nested captures and injections
 				// The name space is used to build the attribute name of a capture in a match. e.g: match.$keyword_nestedKeyword
@@ -246,7 +250,10 @@
 			if(DEBUG_MODE === true){
 				throw 'Error in Expression /' + this.source + '/: ' + msg;
 			}
-		}
+		},
+
+    SKIP: SKIP,
+    BREAK: BREAK
 	};
 
 
@@ -258,8 +265,8 @@
 
       while(match = exp.exec(string)){
         token = map.call(exp, match, tokens);
-        if(token === breaker) break;
-        if(token !== skipper) tokens.push(token);
+        if(token === BREAK) break;
+        if(token !== SKIP) tokens.push(token);
         if(!exp.global) break;
       }
 
@@ -267,21 +274,21 @@
     },
 
     // return the first match in a string that is not the sipper obj
-    search = Exp.search = function(exp, string, mapper){
+    search = Exp.search = function (exp, string, mapper) {
       var match, map = getMapper(mapper);
-      scan(exp, string, function(){
+      scan(exp, string, function () {
         match = map.apply(this, arguments);
-        return match !== skipper? breaker: match;
+        return match !== SKIP? BREAK: match;
       });
       return match || null;
     },
 
     // returns an array containing all matches/mappings and the strings between
-    parse = Exp.parse = function(exp, string, mapper){
+    parse = Exp.parse = function (exp, string, mapper) {
       var
         lastIndex = 0, line = 0, i = 0, strip, map = getMapper(mapper), br = /\n/g,
 
-        tokens = scan(exp, string, function(match, tokens){
+        tokens = scan(exp, string, function (match, tokens) {
           strip = string.slice(lastIndex, match.index);
           line += count(br, strip);
 
@@ -289,29 +296,25 @@
           match.line = line;
 
           if(match.index !== lastIndex) tokens.push(strip);
-          line += count(br, match[0]||'');
+          line += count(br, match[0] || '');
           lastIndex = match.index + match[0].length; // to keep it compatible if no global flag is set, match.lastIndex cant be used here
 
           return map.call(exp, match, tokens);
         });
-      if(lastIndex < string.length) tokens.push(string.slice(lastIndex));
+      if (lastIndex < string.length) tokens.push(string.slice(lastIndex));
 
       return tokens;
     },
 
     // replaces all matches with the mapper
-    replace = Exp.replace = function(exp, string, mapper){
+    replace = Exp.replace = function (exp, string, mapper) {
       return parse.apply(this, arguments).join('');
     },
 
     // returns the number of matches in a string
-    count = Exp.count = function(exp, string, mapper){
+    count = Exp.count = function (exp, string, mapper) {
       return scan.apply(this,arguments).length;
     },
-
-    breaker = Exp.breaker = {},
-
-    skipper = Exp.skipper = {},
 
     esc = Exp.esc = function(string, nativeCharsOnly){
       if(_.isArray(string)) string = string.join('');
@@ -330,7 +333,14 @@
 
 
   var getCaptures = function(path){
-    var p = path.split(SPLITTER);
+    var
+      p = path.split(SPLITTER),
+      res = [];
+//    return _
+//      .chain(this._exp._captures)
+//      .each(function(c,i){
+////        if
+//      },this);
 
     return _
       .chain(_.values(_.pick(this._exp.indices.path, p)))
@@ -371,6 +381,10 @@
     this.length = match.length;
     this.lastRange = exp.lastRange;
     this.range = [match.index, exp.lastIndex];
+
+    this["&"] = match [0]; // matched substring
+    this["`"] = this.input.slice(0, this.index); // preceding string
+    this["'"] = this.input.slice(exp.lastIndex); // following string
   };
 
   // result handler takes care of underscore chaining
@@ -419,6 +433,8 @@
     },{},this);
   };
 
+  m_proto.$ = '$';
+
 
 	// helper
 	var
@@ -450,7 +466,7 @@
 			return Exp.search(/\(|\)|\\\(|\\\)/g, string, function(match){
 				if(match[0] === '('){opener++;}
 				if(match[0] === ')'){opener--;}
-				return opener === 0? string.slice(0,match.index) : skipper;
+				return opener === 0? string.slice(0,match.index) : SKIP;
 			});
     },
 

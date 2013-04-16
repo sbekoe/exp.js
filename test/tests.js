@@ -167,7 +167,7 @@ test("scanning, mapping and skipping",function(){
       '<div id =    "content">content text</div>\n' +
       '<div id="footer">footer text</div>\n',
     function(match){
-      return match.capture('tag.id') == 'skip'? Exp.skipper : 'tagname: '+ match.capture('tag.name') + ', id: ' + match.capture('tag.id') + ', content: ' + match.capture('tag.content');
+      return match.capture('tag.id') == 'skip'? this.SKIP : 'tagname: '+ match.capture('tag.name') + ', id: ' + match.capture('tag.id') + ', content: ' + match.capture('tag.content');
     });
 
   deepEqual(tokens.value(),[
