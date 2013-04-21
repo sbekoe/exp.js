@@ -369,6 +369,19 @@ test('repetitions', function(){
   });
   m = e.exec('0, 1, 2, 3');
   ok(m == '0, 1, 2, 3');
+  
+  e = Exp(/#number{0,,,\s}/,{
+    captureRepetition: true,
+    wildcards:{
+      'number': /(#pre:\d+)-(#main:\d+)/
+    }
+  });
+  m = e.exec('0123-456, 0234-789'); 
+  
+  ok(m == '0123-456, 0234-789');
+  debugger;
+  deepEqual(m.cap(['number.main']), ['456', '789'], 'get listed captures by name');
+  deepEqual(m.cap(['number.pre']), ['0123', '0234'], 'get listed captures by path');
 });
 //test('escaping Exp.esc',function(){});
 //test('expanding external source string Exp.expand',function(){});

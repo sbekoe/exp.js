@@ -4,6 +4,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: '<json:package.json>',
+
     meta: {
       banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
         '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -11,45 +12,63 @@ module.exports = function(grunt) {
         ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
         ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
     },
+
     replace: {
       dist: {
         options: {
           variables: {
-            version: '<%= pkg.version %>'
+            version: '<%= pkg.version %>',
+            Exp:'<%= grunt.file.read("src/exp.core.js") %>',
+            Match:'<%= grunt.file.read("src/match.core.js") %>',
+            Collection:'<%= grunt.file.read("src/collection.core.js") %>'
           }
         },
         files: {
-          './': [
-            'exp.*'
-          ]
+          './': [ 'exp.*' ],
+          // './src':['*.container.js']
         }
       }
     },
+
     lint: {
-      files: ['src/**/*.js']
+      // files: ['src/**/*.core.js']
+      files: ['exp.js']
 //      directives: {
 //        scope:false
 //      }
     },
+
     qunit: {
       files: ['test/**/*.html']
     },
+
     concat: {
-      dist: {
+      // dist: {
+      //   src: ['<banner:meta.banner>', '<file_strip_banner:src/<%= pkg.name %>.js>'],
+      //   dest: '<%= pkg.name %>.js'
+      // },
+      build:{
         src: ['<banner:meta.banner>', '<file_strip_banner:src/<%= pkg.name %>.js>'],
         dest: '<%= pkg.name %>.js'
       }
     },
+
     min: {
-      dist: {
-        src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
+      // dist: {
+      //   src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
+      //   dest: '<%= pkg.name %>.min.js'
+      // }
+      build: {
+        src: ['<banner:meta.banner>', '<config:concat.build.dest>'],
         dest: '<%= pkg.name %>.min.js'
       }
     },
+
     watch: {
       files: '<config:lint.files>',
       tasks: 'lint qunit'
     },
+
     jshint: {
       options: {
         curly: false,
@@ -68,8 +87,8 @@ module.exports = function(grunt) {
         loopfunc: true,
         expr: true,
         evil: true
-
       },
+      
       globals: {
         define: true,
         require: true,
@@ -81,7 +100,8 @@ module.exports = function(grunt) {
   });
   grunt.loadNpmTasks('grunt-replace');
   // Default task.
-  grunt.registerTask('default', 'lint qunit concat min replace');
+  // grunt.registerTask('default', 'lint qunit concat min replace');
+  grunt.registerTask('default', 'lint qunit concat replace min');
   grunt.registerTask('travis', 'lint qunit');
 
 };

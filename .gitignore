@@ -8,6 +8,10 @@ node_modules/
 #################
 .idea/
 
+#################
+## sublime-text
+#################
+.sublime/
 
 #################
 ## Eclipse
@@ -30,7 +34,7 @@ local.properties
 # External tool builders
 .externalToolBuilders/
 
-# Locally stored "Eclipse launch configurations"
+# Locally stored "Eclipse launch configurations"bg
 *.launch
 
 # CDT-specific
