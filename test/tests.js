@@ -119,6 +119,7 @@ test("disjunction",function(){
 
 
 // TODO new example is necessary since < and > are replaced by # and %
+// @deprecated
 test("escaping of special chars '%' and '#'",function(){
   var e = /<%s#tagname id%s=%s"#id"%s>#text<\/#w>/g,
     exp = new Exp(e,{wildcards:{
@@ -379,10 +380,10 @@ test('repetitions', function(){
   m = e.exec('0123-456, 0234-789'); 
   
   ok(m == '0123-456, 0234-789');
-  debugger;
   deepEqual(m.cap(['number.main']), ['456', '789'], 'get listed captures by name');
   deepEqual(m.cap(['number.pre']), ['0123', '0234'], 'get listed captures by path');
 });
+
 //test('escaping Exp.esc',function(){});
 //test('expanding external source string Exp.expand',function(){});
 

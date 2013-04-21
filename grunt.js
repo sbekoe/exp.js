@@ -100,8 +100,8 @@ module.exports = function(grunt) {
   });
   grunt.loadNpmTasks('grunt-replace');
   // Default task.
-  // grunt.registerTask('default', 'lint qunit concat min replace');
-  grunt.registerTask('default', 'lint qunit concat replace min');
+  // grunt.registerTask('default', 'lint qunlint qunit it concat min replace');
+  grunt.registerTask('default', 'concat replace lint qunit min');
   grunt.registerTask('travis', 'lint qunit');
 
 };
