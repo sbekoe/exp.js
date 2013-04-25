@@ -94,6 +94,7 @@ var Exp = (function(){
 				replacement,
         sub,
 				i, src, r, a, n, e;
+        // if(source === '#number{0,,,\\s}') debugger;
 
 			for(i=0; i<srcArr.length; i++){
 				src = srcArr[i].hasOwnProperty('s')? srcArr[i].s : srcArr[i].hasOwnProperty('srcArr')? srcArr[i].source : srcArr[i];
@@ -120,7 +121,7 @@ var Exp = (function(){
               // indicate capture name, aliases and path
               _.each(keywords, function(k){
                 (iName[k] || (iName[k] = [])).push(n-1);
-              });
+              });Object
               (iPath[capture.path] || (iPath[capture.path] = [])).push(n - 1);
             }
 
@@ -131,9 +132,10 @@ var Exp = (function(){
 
             lastIndex = match.index + match[0].length + (match[2]||match[4]? replacement.s.length + 1 : 0);
 						// check for assignments
-            ASSIGNMENT_EXP.lastIndex = lastIndex;
+            // ASSIGNMENT_EXP.lastIndex = lastIndex;
 
-            if(isCapture && (a = ASSIGNMENT_EXP.exec(src))){
+            if(isCapture && (a = src.slice(lastIndex).match(ASSIGNMENT_EXP))){
+            // if(isCapture && (a = ASSIGNMENT_EXP.exec(src))){
               lastIndex += a[0].length;
               capture.a = {
                 force: 2 === a[1].length,
@@ -249,7 +251,7 @@ var Exp = (function(){
       }
 
       // return _.extend(_(tokens),tokens, {length: tokens.length});
-      return _.extend(new Match.Collection(tokens),tokens, {length: tokens.length});
+      return _.extend(new Match.Collection(tokens ),tokens, {length: tokens.length});
     },
 
     // return the first match in a string that is not the sipper obj

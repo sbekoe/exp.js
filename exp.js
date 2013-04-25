@@ -1,4 +1,4 @@
-/*! exp.js - v0.2.0 - 2013-04-21
+/*! exp.js - v0.2.0 - 2013-04-25
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
 
@@ -43,7 +43,7 @@ var
   DELIMITER_ESC = esc(PATH_DELIMITER, true),
   PATH = "\\w+(?:"+ DELIMITER_ESC +"(?:\\w+|\\[\\d+\\]))*",
   DEEP_PATH = "\\w+(?:"+ DELIMITER_ESC +"(?:\\w+|\\[\\d+\\]))+",
-  ASSIGNMENT_EXP = new RegExp('('+ASSIGNMENT_PREFIX + '{1,2})(' + PATH + ')','g'),
+  ASSIGNMENT_EXP = new RegExp('(^'+ASSIGNMENT_PREFIX + '{1,2})(' + PATH + ')'),
   REPETITION_EXP = /^[*+]|^\{(\d+)(,?)(\d*)(?:,([^\}]+))?\}/,
   MARKER = new RegExp('\\$(' + PATH + '|[\\d&])', 'g'),
   DEBUG_MODE = true,
@@ -220,6 +220,7 @@ var Exp = (function(){
 				replacement,
         sub,
 				i, src, r, a, n, e;
+        // if(source === '#number{0,,,\\s}') debugger;
 
 			for(i=0; i<srcArr.length; i++){
 				src = srcArr[i].hasOwnProperty('s')? srcArr[i].s : srcArr[i].hasOwnProperty('srcArr')? srcArr[i].source : srcArr[i];
@@ -246,7 +247,7 @@ var Exp = (function(){
               // indicate capture name, aliases and path
               _.each(keywords, function(k){
                 (iName[k] || (iName[k] = [])).push(n-1);
-              });
+              });Object
               (iPath[capture.path] || (iPath[capture.path] = [])).push(n - 1);
             }
 
@@ -257,9 +258,10 @@ var Exp = (function(){
 
             lastIndex = match.index + match[0].length + (match[2]||match[4]? replacement.s.length + 1 : 0);
 						// check for assignments
-            ASSIGNMENT_EXP.lastIndex = lastIndex;
+            // ASSIGNMENT_EXP.lastIndex = lastIndex;
 
-            if(isCapture && (a = ASSIGNMENT_EXP.exec(src))){
+            if(isCapture && (a = src.slice(lastIndex).match(ASSIGNMENT_EXP))){
+            // if(isCapture && (a = ASSIGNMENT_EXP.exec(src))){
               lastIndex += a[0].length;
               capture.a = {
                 force: 2 === a[1].length,
@@ -375,7 +377,7 @@ var Exp = (function(){
       }
 
       // return _.extend(_(tokens),tokens, {length: tokens.length});
-      return _.extend(new Match.Collection(tokens),tokens, {length: tokens.length});
+      return _.extend(new Match.Collection(tokens ),tokens, {length: tokens.length});
     },
 
     // return the first match in a string that is not the sipper obj
@@ -492,30 +494,38 @@ var Match = (function(_){
       p = path.split(SPLITTER),
       res = [],
       offset = this._exp.offset,
-      e = this._exp;
+      e = this._exp,
+      match = this._match,
+      that = this;
     window.e || (window.e  = []); 
 
     // get listed captures (repetitions)
-    var 
-      listCap = _.chain(this._exp.indices.list)
-      .map(function(index, p){
-          var pos = path.indexOf(p), subPath;
+    var listCap = _
+      .chain(e.indices.list)
+      .map(function(index, listPath){
+          return _
+            .chain(p)
+            .map(function(path){
+              var pos = path.indexOf(listPath), subPath;
 
-          subPath = pos===0? path.slice(pos + p.length + 1) : path;
-          if((pos !== 0 && path.indexOf(PATH_DELIMITER) !==-1) || !e.subExp(index))
-            return false;
+              subPath = pos===0? path.slice(pos + listPath.length + 1) : path;
+              if((pos !== 0 && path.indexOf(PATH_DELIMITER) !==-1) || !e.subExp(index))
+                return false;
 
-          return _.map(e.subExp(index).scan(this._match[index-offset]), function(match){
-            return match.cap([subPath]);
-          });
-        },this)
-      .compact()
+              return _.map(that.getSubMatches(index), function(match){
+              // return _.map(e.subExp(index).scan(match[index-offset]), function(match){
+                return match.cap([subPath]);
+              });
+            })
+            .compact()
+            .value();
+        })
       .flatten()
       .value();
 
     return _
-      .chain(_.values(_.pick(this._exp.indices.path, p)))
-      .concat(_.values(_.pick(this._exp.indices.name, p)))
+      .chain(_.values(_.pick(e.indices.path, p)))
+      .concat(_.values(_.pick(e.indices.name, p)))
       .flatten()
       .union()
       .map(function(index){
@@ -525,7 +535,7 @@ var Match = (function(_){
           i = index - this._exp.offset,
           r = this._exp._captures[i].r,
           c = this._match[i];
-        return !r? c : this._exp.subExp(index).scan(c);
+        return !r? c : this.getSubMatches(index);//this._exp.subExp(index).scan(c);
 
       },this)
       .concat(listCap)
@@ -541,6 +551,7 @@ var Match = (function(_){
     this._wrapped = this._match = match;
     this._exp = exp;
     this._getCaptures = _.memoize(getCaptures);
+    this._subMatch = {};
 
     _.extend(this, match);
 
@@ -575,7 +586,7 @@ var Match = (function(_){
 
 
   proto.at = proto.assignment = function(path){
-    var a = this._assignments || (this._assignments = this._getAssignments());
+    var a = this.getAssignments();
     return path? resolvePath(path, a) : a;
   };
 
@@ -583,27 +594,51 @@ var Match = (function(_){
 
   proto.toString = function(){ return this._match[0]; };
 
-  proto._getAssignments = function(){
-    return _.reduce(this._match, function(res, cap, i){
-      var
-        c = this._exp._captures[i],
-        path,
-        assignment,
-        a;
-      if(cap === undefined || !c.a) return res;
-      assignment = resolvePath(c.a.path, this._exp.assignments);
-      assignment = assignment[cap] || assignment;
-      for(a in assignment)
-        if(c.a.force || res[a] === undefined) res[a] = assignment[a];
+  proto.getAssignments = function(){
+    if(!this._assignments)
+      this._assignments  = _.reduce(this._match, function(res, cap, i){
+        var
+          c = this._exp._captures[i],
+          path,
+          assignment,
+          subAssignments,
+          a;
+        
+        if(cap === undefined || !c.a)
+          return res;
 
-      return res;
-    },{},this);
+        assignment = resolvePath(c.a.path, this._exp.assignments);
+        assignment = assignment[cap] || assignment;
+        
+        for(a in assignment)
+          if(c.a.force || res[a] === undefined)
+            res[a] = assignment[a];
+
+        if(c.r && false)
+          this.getSubMatches(i)
+            .chain()
+            .getAssignments()
+            .each(function(assignment){
+              var a;
+              for(a in assignment)
+                if(c.a.force || res[a] === undefined)
+                  res[a] = assignment[a];
+            });
+
+        return res;
+      },{},this);
+
+    return result(this, this._assignments);
+  };
+
+   proto.getSubMatches = function(index){
+    return this._subMatch[index] || (this._subMatch[index] = this._exp.subExp(index).scan(this._match[index - this._exp.offset]));
   };
 
   proto.$ = '$';
 
   Match.Collection = Collection.extend(Match, {
-    bind:['get', 'cap', 'capture', 'assignment']
+    bind:['get', 'cap', 'capture', 'assignment', 'getAssignments']
   });
 
   return Match;

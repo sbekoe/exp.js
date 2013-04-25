@@ -39,7 +39,7 @@ var
   DELIMITER_ESC = esc(PATH_DELIMITER, true),
   PATH = "\\w+(?:"+ DELIMITER_ESC +"(?:\\w+|\\[\\d+\\]))*",
   DEEP_PATH = "\\w+(?:"+ DELIMITER_ESC +"(?:\\w+|\\[\\d+\\]))+",
-  ASSIGNMENT_EXP = new RegExp('('+ASSIGNMENT_PREFIX + '{1,2})(' + PATH + ')','g'),
+  ASSIGNMENT_EXP = new RegExp('(^'+ASSIGNMENT_PREFIX + '{1,2})(' + PATH + ')'),
   REPETITION_EXP = /^[*+]|^\{(\d+)(,?)(\d*)(?:,([^\}]+))?\}/,
   MARKER = new RegExp('\\$(' + PATH + '|[\\d&])', 'g'),
   DEBUG_MODE = true,

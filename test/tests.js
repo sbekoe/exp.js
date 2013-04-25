@@ -121,7 +121,7 @@ test("disjunction",function(){
 // TODO new example is necessary since < and > are replaced by # and %
 // @deprecated
 test("escaping of special chars '%' and '#'",function(){
-  var e = /<%s#tagname id%s=%s"#id"%s>#text<\/#w>/g,
+  var e = /<%s#tagname id%s=%s"#id"%s>#text<\/#w>/g,mmmmmmmmmm
     exp = new Exp(e,{wildcards:{
       tagname: '\\w+',
       text: '.*',
@@ -374,7 +374,10 @@ test('repetitions', function(){
   e = Exp(/#number{0,,,\s}/,{
     captureRepetition: true,
     wildcards:{
-      'number': /(#pre:\d+)-(#main:\d+)/
+      'number': /(#pre:\d+)-(#main:\d+)>obj/
+    },
+    assignments:{
+      obj: {attr:'val'}
     }
   });
   m = e.exec('0123-456, 0234-789'); 
@@ -382,6 +385,8 @@ test('repetitions', function(){
   ok(m == '0123-456, 0234-789');
   deepEqual(m.cap(['number.main']), ['456', '789'], 'get listed captures by name');
   deepEqual(m.cap(['number.pre']), ['0123', '0234'], 'get listed captures by path');
+  deepEqual(m.cap(['number.pre, number.main']), ['0123', '456', '0234', '789'], 'get listed captures by multiple paths');
+  ok(m.assignment('attr') == 'val');
 });
 
 //test('escaping Exp.esc',function(){});
