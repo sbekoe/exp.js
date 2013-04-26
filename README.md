@@ -1,38 +1,43 @@
+[![Build Status](https://travis-ci.org/sbekoe/exp.js.png)](https://travis-ci.org/sbekoe/exp.js)
+
+
 exp.js
 ======
 
-Regular expressions object oriented.
-
-[![Build Status](https://travis-ci.org/sbekoe/exp.js.png)](https://travis-ci.org/sbekoe/exp.js)
-
-exp.js makes building complex regular expressions easy and keeps them maintainable.
+*exp.js makes building complex regular expressions easy and keeps them maintainable.*
 
 **Note:** exp.js is still in beta phase. So its API may change frequently. !!!
 
+A small showcase is available on [jsfiddle](http://jsfiddle.net/eokeb/rFgdY/8/).
+
 ## Features
-- provides native api:
-    - `.exec()`,
-    - `.test()`,
-    - `.compile()`,
-    - `.global`,
-    - `.ignoreCase`,
-    - `.multiline`,
-    - `.source`,
-    - `.lastIndex`
-    - `.lastMatch`
 - Extended Syntax:
-    - [Named Captures](#named-captures): inline style `/(#name:\w+)/` or with wildcards `/#name/`
-    - [Injections](#injections): `/%name/` represents an epression part which will be wrapped in non-capturing parenthesis
-    - [Lists](#lists): the seperator `[\s]` in the quantifier of `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`
-    - [Attachments](#assignments): `/(\w+)>data.attr/` allows data binding to captures differing from `undefined`
+    - [Named Captures](#named-captures) can be defined inline style `/(#name:\w+)/` or by placeholder `/#name/`.
+    - [Injections](#injections) allow the use of placeholder such in `/%name/` and represent an expression part (definded in the options) which will be wrapped in non-capturing parenthesis.
+    - [Lists](#lists) can be defined by a seperator as the third param of a quantifier. E.g.  `[\s]` in `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`.
+    - [Attachments](#assignments) - `/(\w+)>data.attr/` - allows binding of data on the match obj by captures that differ from `undefined`.
 - Additional Methods:
-    - [`.scan()`](#scanstring-mapper),
-    - [`.search()`](#searchstring-mapper),
-    - [`.parse()`](#parsestring-mapper),
-    - [`.replace()`](#replacestring-mapper)
+    - [Scanning](#scanstring-mapper) `.scan()` fetches all matches at once and returns them in an array.
+    - [Searching](#searchstring-mapper) `.search()`returns the first match that passed the [mapping function](#mapper). 
+    - [Parsing](#parsestring-mapper) `.parse()` returns all tokens in form of an array containing strings & matches alternately.
+    - [Replacing](#replacestring-mapper) `.replace()` returns the the source string with all matches replace by the [mapper](#mapper).
 - Additional Attributes:
-    - [`.lastRange`](#lastrange)
+    - [Range](#lastrange) `.range` is an array containg the start- and end indeces of the matched substring.  
+    - [Last range](#lastrange) `.lastRange` is the range of the last match.
 - Useful Utilities
+    - [Match](#match) is Class that mims and extends the native match object.
+    - [Escaping](#esc) characaters reseved in regular expression can be done by `Exp.esc()`.
+    - Scanning, Searching, Parsing and Replacing with native RegExp objects: `Exp.scan(RegExp, string [,mapper])` ...
+- Native API:
+    - `.exec()`,
+      `.test()`,
+      `.compile()`,
+    - `.global`,
+      `.ignoreCase`,
+      `.multiline`,
+      `.source`,
+      `.lastIndex`
+      `.lastMatch`
 
 ## Dependencies
 - With keeping the size in mind, [underscore](http://underscorejs.org) is deeply intergrated into exp.js.
@@ -41,11 +46,11 @@ exp.js makes building complex regular expressions easy and keeps them maintainab
 exp.js is also available from npm: `$ npm install exp`
 
 ## Instanciation
-The `Exp` constructor exprects at leats one argument: a configuration object holding the source attribute or alternatively a native RegExp object passed first and optionally a config obj following.
+The `Exp` constructor expects at leats one argument: a configuration object holding the source attribute or alternatively a native RegExp object passed first and optionally a config obj following.
 ```javascript
 var exp = new Exp(/\w+/g); // object-oriented
 
-var exp = Exp(/\w+/g); // as well as functional
+var exp = Exp(/\w+/g); // functional
 
 var exp = Exp({
   source: '\\w+'
@@ -58,39 +63,6 @@ var exp = Exp({
 ### Injections
 ### Lists
 ### Attachments
-
-## Match
-In exp.js [`.exec()`](#exec) returns an instance of the `Match` class which inhertis all the good stuff from [underscore](http://underscorejs.org) and wraps the native match array.
-For backward compatibility all attributes of the native match are accessable as usual.
-The match object ptovides some further methods and attributes to access captures by name etc.
-
-### .capture([path](#path)), .cap([path](#path))<a id="capture" /><a id="cap" />
-Gets the first named captures by name or path if they are nested. If the path string is wrapped in an array, all captuers matching the path will be returned.
-```javascript
-var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
-var match = exp.exec('Hi Bill!');
-
-match.capture('sentence') // 'Hi Bill!'
-match.capture('word') // 'Hi'
-match.capture('sentence.word') // 'Hi'
-match.capture(['word']) // ['Hi','Bill']
-```
-
-### .attachment([path](#path)), .at([path](#path))<a id="attachment" /><a id="at" />
-Gets an attached object by path. If the path does not point to anything `undefined` will be returned.
-```javascript
-var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
-var match = exp.exec('Hi Bill!');
-
-match.capture('sentence') // 'Hi Bill!'
-match.capture('word') // 'Hi'
-match.capture('sentence.word') // 'Hi'
-match.capture(['word']) // ['Hi','Bill']
-```
-
-## Mapper
-
-## Path
 
 ## Methods
 ### .exec(string)<a id="exec"/>
@@ -108,17 +80,26 @@ match.index; // 0
 exp.lastIndex; // 3
 ```
 
+returns all tokens in form of an array containing strings & matches alternately.
+returns the the source string with all matches replace by the [mapper](#mapper).
+    
 ### .test(string)<a id="test"/>
 *Returns a boolean whether the epression matched or not*
 
 ### .scan(string [,[mapper](#mapper)])<a id="scan"/>
-*Returns an underscore wrapped array containing all matches  if the global falg is set and a single match or empty list elswise.*
+*Returns an underscore wrapped array containing all matches  if the global flag is set and a single match or empty list elswise.*
 ```javascript
 ```
 
 ### .search(string [,[mapper](#mapper)])<a id="search"/>
-*Returns*
+*Returns the first match that passed the [mapper](#mapper).*
 ```javascript
+var exp = Exp(/(#name:\w+ \w+)/);
+var res = exp.exec('Bill Power, Bob Dalton, Grat Dalton, Dick Broadwell', function(match){
+    return match[0][0] === 'B'? this.SKIP : match;
+});
+
+res.capture('name'); // 'Grat Dalton'
 ```
 
 ### .parse(string [,[mapper](#mapper)])<a id="parse"/>
@@ -130,4 +111,80 @@ exp.lastIndex; // 3
 *Returns*
 ```javascript
 ```
-A small showcase is available on [jsfiddle](http://jsfiddle.net/eokeb/rFgdY/8/).
+
+## Match
+In exp.js [.exec()](#exec) returns an instance of the `Match` class which inhertis all the good stuff from
+[underscore](http://underscorejs.org) and wraps the native match array.
+For backward compatibility all attributes of the native match are accessable as usual.
+The match object provides some further methods and attributes to access captures by name etc.
+
+### .capture([path](#path)), .cap([path](#path))<a id="capture" /><a id="cap" />
+*Gets the first named captures by name or path if they are nested. If the path string is wrapped in an array, all captuers matching the path will be returned.*
+```javascript
+var exp = Exp(/(#sentence:(#word:\w+) (#word:\w+).)/);
+var match = exp.exec('Hi Bill!');
+
+match.capture('sentence') // 'Hi Bill!'
+match.capture('word') // 'Hi'
+match.capture('sentence.word') // 'Hi'
+match.capture(['word']) // ['Hi','Bill']
+```
+
+### .attachment([path](#path)), .atm([path](#path))<a id="attachment" /><a id="at" />
+*Gets an attached object by path. If the path does not point to anything `undefined` will be returned.*
+```javascript
+var exp = Exp(/(#firstname:\w+) (#lastname \w+)>list/g,{
+    attachment: {
+        list:{ 
+            'Dalton': { wanted: true }
+        }
+    }
+});
+var res = exp.scan('Bill Power, Bob Dalton, Grat Dalton, Dick Broadwell');
+
+res[0].capture('lastname') // 'Power'
+res[0].attachment('wanted') // undefined
+
+res[1].capture('lastname') // 'Dalton'
+res[1].attachment('wanted') // true
+```
+
+### .get([path](#path))
+*Is a shorthand for `match.capture(path) || match.attachment(path) || match[path]`.*
+
+## Mapper
+Some methods, like [.scan()](#scanstring-mapper), accept a mapper as second argument.
+The mapper can be a function or string.
+### String-Mapper
+Replaces each match with the specified string in which the `$`-prefixed placeholders will be substituted
+[match.get()](#getpath), similar to
+[String.prototype.replace](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/String/replace#Specifying_a_string_as_a_parameter).
+Possible placehoders are:
+  - Substitute the n-th capture for `$n` where *n* is a number. 
+  - Substitute the matched substring for `$&`.
+  - Substitute the substring that preceds the match for ``$` ``.
+  - Substitute the substring that follows the match for `$'`.
+  - Substitute a named capture or assignment for `$p` where *p* is a [path](#path).
+  - Substitute an attribute of the match object fot `$k` where *k* is the attributes key.
+  
+```javascript
+var exp = Exp(/(#firstname:\w+) (#lastname \w+)/);
+var res = exp.replace('Bill Power', '$lastname, $firstname'); // 'Power, Bill'
+```
+
+### Functional Mapper
+Replaces the match with the mappers return value. The arguments passed to the mapper are: `(match, tokens)`.
+The second argument is an array that contains all the previous matches.
+The mappers context is the exp obect.
+This allows to controll the execution flow
+by returning `this.SKIP` to ignore the current match or `this.BREAK` to stop the execution.
+
+```javascript
+var exp = Exp(/(#firstname:\w+) (#lastname \w+)/g);
+var res = exp.scan('Bill Power, Bob Dalton, Grat Dalton, Dick Broadwell', function(match){
+    return match.cap('lastname') === 'Dalton'? this.SKIP : match.cap('firstname');
+});
+
+res.join(', '); // 'Bill, Dick'
+```
+## Path
