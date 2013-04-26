@@ -1,7 +1,6 @@
-/*! exp.js - v0.2.0 - 2013-04-25
+/*! exp.js - v0.2.0 - 2013-04-26
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
-
 (function (root, factory) {
 
   if (typeof exports === 'object') {
@@ -131,14 +130,11 @@ var Exp = (function(){
     this.initialize(exp, options);
   };
 
-  //Exp.VERSION = '@@version';
-
 	Exp.prototype = {
     initialize: function(exp, options){
       var settings = options || exp || {};
 
       // initial properties
-      //this.source = exp.source? exp.source.toString().slice(1,-1) : exp;
       this.source = exp.source? exp.source.toString() : exp;
       this.global = exp.global || settings.global;
       this.ignoreCase = exp.ignoreCase || settings.ignoreCase;
@@ -220,7 +216,6 @@ var Exp = (function(){
 				replacement,
         sub,
 				i, src, r, a, n, e;
-        // if(source === '#number{0,,,\\s}') debugger;
 
 			for(i=0; i<srcArr.length; i++){
 				src = srcArr[i].hasOwnProperty('s')? srcArr[i].s : srcArr[i].hasOwnProperty('srcArr')? srcArr[i].source : srcArr[i];
@@ -257,11 +252,9 @@ var Exp = (function(){
             exp += src.slice(lastIndex, match.index);
 
             lastIndex = match.index + match[0].length + (match[2]||match[4]? replacement.s.length + 1 : 0);
+            
 						// check for assignments
-            // ASSIGNMENT_EXP.lastIndex = lastIndex;
-
             if(isCapture && (a = src.slice(lastIndex).match(ASSIGNMENT_EXP))){
-            // if(isCapture && (a = ASSIGNMENT_EXP.exec(src))){
               lastIndex += a[0].length;
               capture.a = {
                 force: 2 === a[1].length,
@@ -423,10 +416,7 @@ var Exp = (function(){
       return scan.apply(this,arguments).length;
     };
 
-    // esc = Exp.esc = function(string, nativeCharsOnly){
-    //   if(_.isArray(string)) string = string.join('');
-    //   return string.replace(new RegExp('[\\-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\\^\\$\\|' + (nativeCharsOnly? '' : '%#') +']','g'), "\\@@Exp");
-    // };
+    //dies ist ein test
     Exp.esc = esc;
   // extend prototype with featured methods
   _.each(['scan', 'search', 'parse','replace', 'count'], function(method){
@@ -472,7 +462,7 @@ var Exp = (function(){
         return tokens.join('');
       };
     },
-
+    //dies ist auch ein test
     findClosedReplacement = function (string){
       var opener = 1;
       return Exp.search(/\(|\)|\\\(|\\\)/g, string, function(match){
