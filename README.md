@@ -26,7 +26,8 @@ A small showcase is available on [jsfiddle](http://jsfiddle.net/eokeb/rFgdY/8/).
     - [Last range](#lastrange) `.lastRange` is the range of the last match.
 - Useful Utilities
     - [Match](#match) is Class that mims and extends the native match object.
-    - [Escaping](#esc) characaters reseved in regular expression can be done by `Exp.esc()`.
+    - [Match Collections](#match-collection) make performing actions on arrays of matches more fluid. 
+    - [Escaping](#esc) of characaters, which are reserved in regular expression, can be done with `Exp.esc()`.
     - Scanning, Searching, Parsing and Replacing with native RegExp objects: `Exp.scan(RegExp, string [,mapper])` ...
 - Native API:
     - `.exec()`,
@@ -181,9 +182,14 @@ by returning `this.SKIP` to ignore the current match or `this.BREAK` to stop the
 
 ```javascript
 var exp = Exp(/(#firstname:\w+) (#lastname \w+)/g);
-var res = exp.scan('Bill Power, Bob Dalton, Grat Dalton, Dick Broadwell', function(match){
+var bandits = 'Bill Power, Bob Dalton, Grat Dalton, Dick Broadwell';
+
+// the functional mapper
+var wanted = function(match){
     return match.cap('lastname') === 'Dalton'? this.SKIP : match.cap('firstname');
-});
+};
+
+var res = exp.scan(bandits, wanted);
 
 res.join(', '); // 'Bill, Dick'
 ```
