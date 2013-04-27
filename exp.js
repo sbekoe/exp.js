@@ -1,4 +1,4 @@
-/*! exp.js - v0.2.0 - 2013-04-26
+/*! exp.js - v0.2.0 - 2013-04-27
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
 (function (root, factory) {
@@ -580,7 +580,13 @@ var Match = (function(_){
     return path? resolvePath(path, a) : a;
   };
 
-  proto.get = function(path){ return this.capture(path) || this.assignment(path) || this[path]; } ;
+  proto.get = function(path){
+    var res;
+    return (res = this.capture(path)) !== undefined ? res :
+      (res  = this.assignment(path)) !== undefined ? res :
+      (res = (path[0]==='$'? this[path.slice(1)] : this[path])) !== undefined? res :
+      this[path];
+  } ;
 
   proto.toString = function(){ return this._match[0]; };
 
