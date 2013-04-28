@@ -97,7 +97,8 @@ match.capture('$&'); // 'Bob Dalton'
 ### Lists
 Lists extend the native RegExp occurences syntax `{n,[m]}` with a third parameter `{n,[m],[s]}`, where `s` is optional and represents a subexpression defining the list seperator.
 ```javascript
-// compiled to /((?:(\w+) (\w+))(?:[,\s]+(?:(?:\w+) (?:\w+))){0,})/
+// compiled to (#bandit(?:[,\\s]+#bandit){0,})
+// /((?:(\w+) (\w+))(?:[,\s]+(?:(?:\w+) (?:\w+))){0,})/
 var exp = Exp({
   source:'#bandit{1,,[,\\s]+}',
   wildcards:{
