@@ -61,7 +61,7 @@ var exp = Exp({
 
 ## Syntax
 ### Named Captures
-Named captures allow to design complex expressions independently from capture indexes. There are two possible definition style: inline and wildcard.
+Named captures allow to design complex expressions independently from capture indexes. There are two possible definition styles: inline and wildcard.
 ```javascript
 // compiled to /(\w+) (\w+)/
 var exp = Exp({
@@ -78,7 +78,7 @@ match.capture('lastname'); // 'Dalton'
 ```
 
 ### Injections
-Injections work in the same way like named Captures, but there sub expressions are wrapped in non-captureing parenthesis.
+Injections work in the same way like named captures, but there sub expressions are wrapped in non-captureing parenthesis.
 ```javascript
 // compiled to /(?:\w+) (?:\w+)/
 var exp = Exp({
@@ -95,7 +95,7 @@ match.capture('$&'); // 'Bob Dalton'
 ```
 
 ### Lists
-Lists extend the native RegExp occurences syntax `{n,[m]}` with a third parameter `{n,[m],[s]}, where `s` is optional and represents a subexpression defining the lists seperator.
+Lists extend the native RegExp occurences syntax `{n,[m]}` with a third parameter `{n,[m],[s]}`, where `s` is optional and represents a subexpression defining the list seperator.
 ```javascript
 // compiled to /((?:(\w+) (\w+))(?:[,\s]+(?:(?:\w+) (?:\w+))){0,})/
 var exp = Exp({
