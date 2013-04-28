@@ -288,7 +288,7 @@ test('assignments',function(){
 test('repetitions', function(){
   var e,m;
   e = Exp(/(#list:(#number:\d))*$/,{
-    captureRepetition: true
+    enableLists: true
   });
 
   m = e.exec('0123');
@@ -305,7 +305,7 @@ test('repetitions', function(){
   );
 /*
   e = Exp(/((#number:\d))*$/,{
-    captureRepetition: true,
+    enableLists: true,
     captureIndices:true
   });
 
@@ -323,7 +323,7 @@ test('repetitions', function(){
   );
 */
   e = Exp(/(#number:\d){0,, }$/,{
-    captureRepetition: true
+    enableLists: true
   });
   m = e.exec('0 1 2 3');
   deepEqual(
@@ -338,14 +338,14 @@ test('repetitions', function(){
   );
 
   e = Exp(/(#number:\d){0, }$/,{
-    captureRepetition: true
+    enableLists: true
   });
   m = e.exec('0 1 2 3');
   equal(m.match,'', '0 separated repetitions');
 
   // repetition of named capture defined in wildcards
   e = Exp(/#number{0,, }/,{
-    captureRepetition: true,
+    enableLists: true,
     wildcards:{
       'number': /\d/
     }
@@ -363,7 +363,7 @@ test('repetitions', function(){
   );
 
   e = Exp(/#number{0,,,\s}/,{
-    captureRepetition: true,
+    enableLists: true,
     wildcards:{
       'number': /\d/
     }
@@ -372,7 +372,7 @@ test('repetitions', function(){
   ok(m == '0, 1, 2, 3');
   
   e = Exp(/#number{0,,,\s}/,{
-    captureRepetition: true,
+    enableLists: true,
     wildcards:{
       'number': /(#pre:\d+)-(#main:\d+)>obj/
     },
@@ -391,4 +391,3 @@ test('repetitions', function(){
 
 //test('escaping Exp.esc',function(){});
 //test('expanding external source string Exp.expand',function(){});
-

@@ -15,7 +15,7 @@ A small showcase is available on [jsfiddle](http://jsfiddle.net/eokeb/rFgdY/8/).
     - [Named Captures](#named-captures) can be defined inline style `/(#name:\w+)/` or by placeholder `/#name/`.
     - [Injections](#injections) allow the use of placeholder such in `/%name/` and represent an expression part (definded in the options) which will be wrapped in non-capturing parenthesis.
     - [Lists](#lists) can be defined by a seperator as the third param of a quantifier. E.g.  `[\s]` in `/(\d){0,[\s]}/` allows matching `'1 2 3 4'` instead of `'1234'`.
-    - [Attachments](#assignments) - `/(\w+)>data.attr/` - allows binding of data on the match obj by captures that differ from `undefined`.
+    - [Attachments](#attachments) - `/(\w+)>data.attr/` - allows binding of data on the match obj by captures that differ from `undefined`.
 - Additional Methods:
     - [Scanning](#scanstring-mapper) `.scan()` fetches all matches at once and returns them in an array.
     - [Searching](#searchstring-mapper) `.search()`returns the first match that passed the [mapping function](#mapper). 
@@ -61,8 +61,57 @@ var exp = Exp({
 
 ## Syntax
 ### Named Captures
+Named captures allow to design complex expressions independently from capture indexes. There are two possible definition style: inline and wildcard.
+```javascript
+// compiled to /(\w+) (\w+)/
+var exp = Exp({
+  source: '(#firstname:\\w+) #lastname',
+  wdilcards:{
+    "lastname": "\\w+"
+  }
+});
+
+var match = exp.exec('Bob Dalton')
+
+match.capture('firstname'); // 'Bob'
+match.capture('lastname'); // 'Dalton'
+```
+
 ### Injections
+Injections work in the same way like named Captures, but there sub expressions are wrapped in non-captureing parenthesis.
+```javascript
+// compiled to /(?:\w+) (?:\w+)/
+var exp = Exp({
+  source: '(%firstname:\\w+) %lastname',
+  wdilcards:{
+    "lastname": "\\w+"
+  }
+});
+
+var match = exp.exec('Bob Dalton')
+
+match.capture('firstname'); // undefined
+match.capture('$&'); // 'Bob Dalton'
+```
+
 ### Lists
+Lists extend the native RegExp occurences syntax `{n,[m]}` with a third parameter `{n,[m],[s]}, where `s` is optional and represents a subexpression defining the lists seperator.
+```javascript
+// compiled to /((?:(\w+) (\w+))(?:[,\s]+(?:(?:\w+) (?:\w+))){0,})/
+var exp = Exp({
+  source:'#bandit{1,,[,\\s]+}',
+  wildcards:{
+    bandit: '(#firstname:\\w+) (#lastname:\\w+)'
+  }
+});
+var bandits = 'Bill Power, Bob Dalton, Grat Dalton, Dick Broadwell';
+
+var match = exp.exec(bandits);
+
+match.capture('bandit'); // Array of 4 sub matches
+match.capture(['firstname']); // ["Bill", "Bob", "Grat", "Dick"]
+```
+
 ### Attachments
 
 ## Methods
