@@ -3,12 +3,8 @@ var Match = (function(_){
   var getCaptures = function(path){
     var
       p = path.split(SPLITTER),
-      res = [],
-      offset = this._exp.offset,
       e = this._exp,
-      match = this._match,
       that = this;
-    window.e || (window.e  = []); 
 
     // get listed captures (repetitions)
     var listCap = _
@@ -19,14 +15,15 @@ var Match = (function(_){
             .map(function(path){
               var pos = path.indexOf(listPath), subPath;
 
-              subPath = pos===0? path.slice(pos + listPath.length + 1) : path;
+              subPath = pos === 0? path.slice(pos + listPath.length + 1) : path;
+
               if(!subPath || (pos !== 0 && path.indexOf(PATH_DELIMITER) !==-1) || !e.subExp(index))
                 return false;
 
-              return _.map(that.getSubMatches(index), function(match){
-              // return _.map(e.subExp(index).scan(match[index-offset]), function(match){
+              return that.getSubMatches(index).map(function(match){
                 return match.cap([subPath]);
               });
+
             })
             .compact()
             .value();
@@ -40,14 +37,7 @@ var Match = (function(_){
       .flatten()
       .union()
       .map(function(index){
-        // return this._match[index - offset];
-
-        var
-          i = index - this._exp.offset,
-          r = this._exp._captures[i].r,
-          c = this._match[i];
-        return !r? c : this.getSubMatches(index);//this._exp.subExp(index).scan(c);
-
+        return !this.isList(index)? this.getCapture(index) : this.getSubMatches(index);
       },this)
       .concat(listCap)
       .compact()
@@ -152,14 +142,27 @@ var Match = (function(_){
     return result(this, this._assignments);
   };
 
-   proto.getSubMatches = function(index){
-    return this._subMatch[index] || (this._subMatch[index] = this._exp.subExp(index).scan(this._match[index - this._exp.offset]));
+  // returns the offseted index
+  proto.getOffset = function(index){
+    return index - this._exp.offset;
+  };
+
+  proto.getSubMatches = function(index){
+    return this._subMatch[index] || (this._subMatch[index] = this._exp.subExp(index).scan(this._match[this.getOffset(index)]));
+  };
+
+  proto.getCapture = function(index){
+    return this._match[this.getOffset(index)];
+  };
+
+  proto.isList = function(index){
+    return !!this._exp._captures[this.getOffset(index)].r;
   };
 
   proto.$ = '$$';
 
   Match.Collection = Collection.extend(Match, {
-    bind:['get', 'cap', 'capture', 'assignment', 'getAssignments']
+    bind:['get', 'cap', 'capture', 'atm', 'attachment', 'assignment', 'getAssignments']
   });
 
   return Match;
