@@ -130,9 +130,6 @@ match.index; // 0
 
 exp.lastIndex; // 3
 ```
-
-returns all tokens in form of an array containing strings & matches alternately.
-returns the the source string with all matches replace by the [mapper](#mapper).
     
 ### .test(string)<a id="test"/>
 *Returns a boolean whether the epression matched or not*
@@ -154,12 +151,12 @@ res.capture('name'); // 'Grat Dalton'
 ```
 
 ### .parse(string [,[mapper](#mapper)])<a id="parse"/>
-*Returns*
+*Returns all tokens in form of an array containing glue strings & matches alternately.*
 ```javascript
 ```
 
 ### .replace(string [,[mapper](#mapper)])<a id="repace"/>
-*Returns*
+*Returns the the source string with all matches replace by the [mapper](#mapper).*
 ```javascript
 ```
 
