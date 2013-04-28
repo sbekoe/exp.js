@@ -144,7 +144,7 @@ var Exp = (function(){
             // - exactly 5:   /(\d){5, }/     -->   /(\d(?: \d){4})/      matches '0 1 2 3 4'
             // - indefinite:  /(\d){0,, }/    -->   /(\d?(?: \d){0,})/    matches '0 1 2 3 4' and '1' and ''
             // - 0 to 5:      /(\d){0,5, }/   -->   /(\d?(?: \d){0,4})/   matches matches '0 1' and '0 1 2 3 4'
-            if(isCapture && this.options.captureRepetition && (r = REPETITION_EXP.exec(src.slice(lastIndex)))){
+            if(isCapture && this.options.enableLists && (r = REPETITION_EXP.exec(src.slice(lastIndex)))){
               var repConf = 0, repNumber = 1, repFinite = 2, repLimit = 3, repDelimiter = 4;
               capture.r = {
                 capBound: [n, captures.length],
@@ -306,7 +306,7 @@ var Exp = (function(){
   // default expessions settings
   var
     defaults = {
-      captureRepetition: false,
+      enableLists: true,
       global: false,
       ignoreCase: false,
       multiline: false
