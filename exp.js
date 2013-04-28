@@ -1,4 +1,4 @@
-/*! exp.js - v0.2.0 - 2013-04-28
+/*! exp.js - v0.2.1 - 2013-04-28
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
 (function (root, factory) {
@@ -311,7 +311,7 @@ var Exp = (function(){
 			if(match = this._exp.exec(string)){
         this.lastIndex = this._exp.lastIndex;
         this.lastMatch = m = new Match(match, this);
-        this.lastRange = m.lastRange;
+        this.lastRange = m.range;
 			}
 
 			return  m || null;
@@ -499,7 +499,7 @@ var Match = (function(_){
               var pos = path.indexOf(listPath), subPath;
 
               subPath = pos===0? path.slice(pos + listPath.length + 1) : path;
-              if((pos !== 0 && path.indexOf(PATH_DELIMITER) !==-1) || !e.subExp(index))
+              if(!subPath || (pos !== 0 && path.indexOf(PATH_DELIMITER) !==-1) || !e.subExp(index))
                 return false;
 
               return _.map(that.getSubMatches(index), function(match){
@@ -529,6 +529,7 @@ var Match = (function(_){
 
       },this)
       .concat(listCap)
+      .compact()
       .union()
       .value();
   };
@@ -569,7 +570,7 @@ var Match = (function(_){
   proto.cap = proto.capture = function(path){
     var
       a = _.isArray(path),
-      c = this._getCaptures(a? path[0] : path);
+      c = this._getCaptures(a? path.join(',') : path);
 
     return result(this, a? c : c[0]);
   };
@@ -643,7 +644,7 @@ var Match = (function(_){
   return Match;
 })(_);
 
-Exp.VERSION = '0.2.0';
+Exp.VERSION = '0.2.1';
 
 Exp.Collection = Collection;
 Exp.Match = Match;

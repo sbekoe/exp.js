@@ -186,7 +186,7 @@ var Exp = (function(){
 			if(match = this._exp.exec(string)){
         this.lastIndex = this._exp.lastIndex;
         this.lastMatch = m = new Match(match, this);
-        this.lastRange = m.lastRange;
+        this.lastRange = m.range;
 			}
 
 			return  m || null;

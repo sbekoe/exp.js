@@ -20,7 +20,7 @@ var Match = (function(_){
               var pos = path.indexOf(listPath), subPath;
 
               subPath = pos===0? path.slice(pos + listPath.length + 1) : path;
-              if((pos !== 0 && path.indexOf(PATH_DELIMITER) !==-1) || !e.subExp(index))
+              if(!subPath || (pos !== 0 && path.indexOf(PATH_DELIMITER) !==-1) || !e.subExp(index))
                 return false;
 
               return _.map(that.getSubMatches(index), function(match){
@@ -50,6 +50,7 @@ var Match = (function(_){
 
       },this)
       .concat(listCap)
+      .compact()
       .union()
       .value();
   };
@@ -90,7 +91,7 @@ var Match = (function(_){
   proto.cap = proto.capture = function(path){
     var
       a = _.isArray(path),
-      c = this._getCaptures(a? path[0] : path);
+      c = this._getCaptures(a? path.join(',') : path);
 
     return result(this, a? c : c[0]);
   };
