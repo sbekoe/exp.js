@@ -575,10 +575,13 @@ var Match = (function(_){
   };
 
 
-  proto.at = proto.assignment = function(path){
+  proto.atm = proto.attachment = function(path){
     var a = this.getAssignments();
     return path? resolvePath(path, a) : a;
   };
+
+  //@deprecated
+  proto.assignment = proto.atm;
 
   proto.get = function(path){
     var res;
