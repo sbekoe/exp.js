@@ -1,4 +1,4 @@
-/*! exp.js - v0.2.1 - 2013-04-29
+/*! exp.js - v0.2.1 - 2013-05-05
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
 (function (root, factory) {
@@ -64,29 +64,29 @@ var Collection = (function(_){
   Collection.prototype = _([]);
 
   Collection.prototype.bind = function(method, context) {
-    var obj = this._parent, that = this;
+    var obj = this._parent, _this = this;
     if(_.isFunction(obj[method]))
-      that[method] = function(){
+      _this[method] = function(){
         var args = arguments;
         return this.map(function(e){
           return obj[method].apply(context || e, args);
         });
       };
     else if(_.isFunction(_[method]))
-      that[method] = function(){
+      _this[method] = function(){
         var args = arguments;
         return this.map(function(e){
           return _[method].apply(context || e, [e].concat(args));
         });
       };
     else
-      that[method] = function(){
+      _this[method] = function(){
         var args = arguments;
         return this.map(function(e){
           return _.isFunction(e[method])? e[method].apply(context || e, args) : e[method];
         });
       };
-    return that[method];
+    return _this[method];
   };
 
   Collection.prototype.add = function(e) {
@@ -148,10 +148,16 @@ var Exp = (function(){
       this.assignments = settings.assignments || {};
 
       // runtime properties
-      this.lastIndex = settings.lastIndex || 0;
-      this.lastRange = [0,0];
+      this.zero(settings.lastIndex);
 
       this.compile(settings);
+    },
+
+    zero: function(lastIndex){
+      this.lastIndex = lastIndex || 0;
+      this.lastRange = [0, lastIndex || 0];
+      this.lastMatch = null;
+      return this;
     },
 
     /** @constructs */
@@ -359,7 +365,9 @@ var Exp = (function(){
     // Returns an array containing all matches/mappings of the given string.
     scan = Exp.scan = function(exp, string, mapper){
       var tokens = [], token, match, map = getMapper(mapper);
-      exp.lastIndex = 0;
+      // exp.lastIndex = 0;
+      if(_.isFunction(exp.zero)) exp.zero();
+      else exp.lastIndex = 0;
 
       while(match = exp.exec(string)){
         token = map.call(exp, match, tokens);

@@ -23,10 +23,16 @@ var Exp = (function(){
       this.assignments = settings.assignments || {};
 
       // runtime properties
-      this.lastIndex = settings.lastIndex || 0;
-      this.lastRange = [0,0];
+      this.zero(settings.lastIndex);
 
       this.compile(settings);
+    },
+
+    zero: function(lastIndex){
+      this.lastIndex = lastIndex || 0;
+      this.lastRange = [0, lastIndex || 0];
+      this.lastMatch = null;
+      return this;
     },
 
     /** @constructs */
@@ -234,7 +240,9 @@ var Exp = (function(){
     // Returns an array containing all matches/mappings of the given string.
     scan = Exp.scan = function(exp, string, mapper){
       var tokens = [], token, match, map = getMapper(mapper);
-      exp.lastIndex = 0;
+      // exp.lastIndex = 0;
+      if(_.isFunction(exp.zero)) exp.zero();
+      else exp.lastIndex = 0;
 
       while(match = exp.exec(string)){
         token = map.call(exp, match, tokens);

@@ -9,29 +9,29 @@ var Collection = (function(_){
   Collection.prototype = _([]);
 
   Collection.prototype.bind = function(method, context) {
-    var obj = this._parent, that = this;
+    var obj = this._parent, _this = this;
     if(_.isFunction(obj[method]))
-      that[method] = function(){
+      _this[method] = function(){
         var args = arguments;
         return this.map(function(e){
           return obj[method].apply(context || e, args);
         });
       };
     else if(_.isFunction(_[method]))
-      that[method] = function(){
+      _this[method] = function(){
         var args = arguments;
         return this.map(function(e){
           return _[method].apply(context || e, [e].concat(args));
         });
       };
     else
-      that[method] = function(){
+      _this[method] = function(){
         var args = arguments;
         return this.map(function(e){
           return _.isFunction(e[method])? e[method].apply(context || e, args) : e[method];
         });
       };
-    return that[method];
+    return _this[method];
   };
 
   Collection.prototype.add = function(e) {
