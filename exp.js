@@ -1,4 +1,4 @@
-/*! exp.js - v0.2.1 - 2013-05-05
+/*! exp.js - v0.2.1 - 2013-05-14
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
 (function (root, factory) {
@@ -409,7 +409,7 @@ var Exp = (function(){
 
           return map.call(exp, match, tokens);
         });
-      if (lastIndex < string.length) tokens.push(string.slice(lastIndex));
+      if (lastIndex < string.length) tokens.push(tokens[tokens.length] = string.slice(lastIndex));
 
       return tokens;
     },

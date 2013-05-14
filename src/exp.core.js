@@ -284,7 +284,7 @@ var Exp = (function(){
 
           return map.call(exp, match, tokens);
         });
-      if (lastIndex < string.length) tokens.push(string.slice(lastIndex));
+      if (lastIndex < string.length) tokens.push(tokens[tokens.length] = string.slice(lastIndex));
 
       return tokens;
     },
