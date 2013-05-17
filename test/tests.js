@@ -121,7 +121,7 @@ test("disjunction",function(){
 // TODO new example is necessary since < and > are replaced by # and %
 // @deprecated
 test("escaping of special chars '%' and '#'",function(){
-  var e = /<%s#tagname id%s=%s"#id"%s>#text<\/#w>/g,mmmmmmmmmm
+  var e = /<%s#tagname id%s=%s"#id"%s>#text<\/#w>/g,//mmmmmmmmmm
     exp = new Exp(e,{wildcards:{
       tagname: '\\w+',
       text: '.*',
@@ -183,7 +183,7 @@ test('parsing & replacing',function(){
     exp = Exp({ source:'\{\{(#key:\\w+)}\}', global:true}),
     tpl = 'Hi, my name is {{name}}!',
     data = {name: 'Ted'},
-    mapper = function(match, tokens){ return data[match.capture('key')] || match.match},
+    mapper = function(match, tokens){ return data[match.capture('key')] || match.toString()},
     res = exp.parse(tpl, mapper);
 
   deepEqual(res.value(), ['Hi, my name is ', 'Ted', '!'], 'parse with functional mapper');
@@ -197,19 +197,24 @@ test('parsing & replacing',function(){
   equal(r1, 'Bond, James', 'replace with named captures in string mapper');
   equal(r2, 'Bond, James', 'replace with indexed captures in string mapper');
 
-  var poem = Exp(/^.*$/gm).replace(
-    'The rose is red,\n' +
-    'the violet\'s blue,\n' +
-    'The honey\'s sweet,\n' +
-    'and so are you.',
-    '$line: $&'
-  );
-  equal(poem,
+
+  var poem =  'The rose is red,\n' +
+              'the violet\'s blue,\n' +
+              'The honey\'s sweet,\n' +
+              'and so are you.';
+
+  var poem1 = Exp(/^.*$/gm).replace(poem, '$line: $&');
+  var poem2 = Exp(/^.*$/gm).parse(poem);
+  equal(poem1,
     '0: The rose is red,\n' +
     '1: the violet\'s blue,\n' +
     '2: The honey\'s sweet,\n' +
-    '3: and so are you.'
-  );
+    '3: and so are you.',
+  'String mapper converts intermediate (pseudo) matches to native strings');
+  ok(poem2[0] instanceof Exp.Match, 'match is instanceof Match');
+  ok(poem2[1] instanceof Exp.Match && poem2[1].pseudo === true, 'intermediate strings are represented by pseudo matches: marked with pseudo flag');
+  ok(poem2[1] !== '\n' && poem2[1] == '\n', 'intermediate (pseudo) matches are correctly typcasted to string');
+  ok(poem2.join('') === poem);
 });
 
 test('named inline captures',function(){

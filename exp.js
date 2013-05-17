@@ -1,4 +1,4 @@
-/*! exp.js - v0.2.1 - 2013-05-14
+/*! exp.js - v0.2.1 - 2013-05-16
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
 (function (root, factory) {
@@ -47,7 +47,7 @@ var
   MARKER = new RegExp('\\$(' + PATH + '|[\\d&])', 'g'),
   DEBUG_MODE = true,
   SPLITTER = /,|\s+/,
-  PARENTHESIS = /(\\\(|\(\?[:=!])|\((?:#\w+:)?/g,
+  PARENTHESIS = /(\\\(|\(\?[:=!])|\((?:#\w+:)?/g, // matches '\(', '(?:', '(?=', '(?!' or '(#XXX:'
 
   BREAK = {},
   SKIP = {};
@@ -101,7 +101,8 @@ var Collection = (function(_){
       parent = protos.prototype || protos,
       bind = statics.bind || _.functions(protos),
       c = s.constructor || function(){},
-      constructor = function(){
+      constructor = function(list){
+        if(!(this instanceof constructor)) return new constructor(list);
         Collection.apply(this, arguments);
         c.apply(this, arguments);
       },
@@ -171,11 +172,17 @@ var Exp = (function(){
         settings = options||{},
         w;
 
-      for(w in wc){if(wc.hasOwnProperty(w)){
-        if(w[0] === CAPTURE_PREFIX){w = w.slice(1); captures.push(w); escaped.push(w);}
-        if(w[0] === INJECTION_PREFIX){ w = w.slice(1); injections.push(w); escaped.push(w);}
+      for(w in wc)if(wc.hasOwnProperty(w)){
+        if(w[0] === CAPTURE_PREFIX){
+          w = w.slice(1); captures.push(w);
+          escaped.push(w);
+        }
+        if(w[0] === INJECTION_PREFIX){
+          w = w.slice(1); injections.push(w);
+          escaped.push(w);
+        }
         names.push(w);
-      }}
+      }
       this._captures = settings.captures || [{path:'', name:''}];
       this.indices = settings.indices || {path:{}, name:{}, list:{}};
       this.offset = settings.offset || 0;
@@ -284,7 +291,7 @@ var Exp = (function(){
               (iList[capture.path] || (iList[capture.path] = [])).push(n - 1);
               if(r[repDelimiter]){
                 // remove the captures in the repetition pattern
-                var repetition = Exp.parse(PARENTHESIS, sub, function(m){ return m[1] || '(?:'; }).join('');
+                var repetition = Exp.parse(PARENTHESIS, sub, function(m){ return m.pseudo? m : m[1] || '(?:'; }).join('');
                 sub = '(?:' + sub + ')' + (r[repNumber] !== '0'? '': r[repFinite]?'?':'{0}') + '(?:'+ r[repDelimiter] + '(?:' + repetition + ')' + '){' + (r[repNumber] === '0'? 0 : r[repNumber]-1) + r[repFinite] + (r[repLimit]? r[repLimit] === '0'? 0:r[repLimit]-1 :'') + '}';
               }else
                 sub = '(?:' + sub + ')' + r[repConf];
@@ -356,6 +363,8 @@ var Exp = (function(){
       return this._captures[i].e;
     },
 
+
+
     SKIP: SKIP,
     BREAK: BREAK
   };
@@ -364,7 +373,12 @@ var Exp = (function(){
   var
     // Returns an array containing all matches/mappings of the given string.
     scan = Exp.scan = function(exp, string, mapper){
-      var tokens = [], token, match, map = getMapper(mapper);
+      var
+        map = getMapper(mapper),
+        wrap = exp instanceof Exp? Match.Collection : _,
+        tokens = [],
+        token,
+        match;
       // exp.lastIndex = 0;
       if(_.isFunction(exp.zero)) exp.zero();
       else exp.lastIndex = 0;
@@ -378,7 +392,7 @@ var Exp = (function(){
       }
 
       // return _.extend(_(tokens),tokens, {length: tokens.length});
-      return _.extend(new Match.Collection(tokens ),tokens, {length: tokens.length});
+      return _.extend(wrap(tokens), tokens, {length: tokens.length});
     },
 
     // return the first match in a string that is not the sipper obj
@@ -386,29 +400,47 @@ var Exp = (function(){
       var match, map = getMapper(mapper);
       scan(exp, string, function () {
         match = map.apply(this, arguments);
-        return match !== SKIP? BREAK: match;
+        return match !== SKIP? BREAK : match;
       });
+
       return match || null;
     },
 
     // returns an array containing all matches/mappings and the strings between
     parse = Exp.parse = function (exp, string, mapper) {
       var
-        lastIndex = 0, line = 0, i = 0, strip, map = getMapper(mapper), br = /\n/g,
+        lastIndex = 0,
+        line = 0,
+        i = 0,
+        strip,
+        map = getMapper(mapper),
+        br = /\n/g,
+        nativeExp = !(exp instanceof Exp),
 
         tokens = scan(exp, string, function (match, tokens) {
           strip = string.slice(lastIndex, match.index);
+          
+          // if(match.index !== lastIndex) tokens.push(nativeExp? strip : 
+          if(match.index !== lastIndex) tokens.push(
+            map.call(exp, pseudoMatch({
+              0: strip,
+              index: lastIndex,
+              input: string,
+              line: line
+            },exp), tokens)
+          );
+
           line += count(br, strip);
 
           match.i = ++i;
           match.line = line;
 
-          if(match.index !== lastIndex) tokens.push(strip);
           line += count(br, match[0] || '');
           lastIndex = match.index + match[0].length; // to keep it compatible if no global flag is set, match.lastIndex cant be used here
 
           return map.call(exp, match, tokens);
         });
+      
       if (lastIndex < string.length) tokens.push(tokens[tokens.length] = string.slice(lastIndex));
 
       return tokens;
@@ -422,6 +454,34 @@ var Exp = (function(){
     // returns the number of matches in a string
     count = Exp.count = function (exp, string, mapper) {
       return scan.apply(this,arguments).length;
+    },
+
+    matchToString = function(match){
+      return '' + (match||this)[0];
+    },
+
+    matchToJSON = function(match){
+      var m = match || this;
+      return m.pseudo ? m.toString() : m;
+    },
+
+    pseudoMatch =  function(attr, exp){
+      var match = _.extend(
+        [],
+        {
+          0: '',
+          index: 0,
+          line: 0,
+          input: '',
+          length: exp && exp._captures && exp._captures.length || 1,
+          pseudo: true,
+          toString: matchToString,
+          toJSON: matchToJSON
+        },
+        attr || {}
+      );
+      
+      return exp instanceof Exp? Match(match, exp) : match;
     };
 
     //dies ist ein test
@@ -461,10 +521,12 @@ var Exp = (function(){
       if (typeof mapper !== 'string') return mapper || _.identity;
 
       tokens = parse(MARKER, mapper, function(m, t){
-        indices[t.length] = m[1];
+        if(m[1]) indices[t.length] = m[1];
+        else return m.toString();
       }).value();
 
       return function(match){
+        if(match.pseudo) return match[0];
         for(var i in indices)
           tokens[i] = indices[i] === '&'? match[0] : match.get? match.get(indices[i]) : match[indices[i]];
         return tokens.join('');
@@ -548,6 +610,7 @@ var Match = (function(_){
     this.length = match.length;
     this.lastRange = exp.lastRange;
     this.range = [match.index, exp.lastIndex];
+    this.pseudo = !!match.pseudo;
 
     this["&"] = match [0]; // matched substring
     this["`"] = this.input.slice(0, this.index); // preceding string
@@ -576,7 +639,7 @@ var Match = (function(_){
 
   proto.atm = proto.attachment = function(path){
     var a = this.getAssignments();
-    return path? resolvePath(path, a) : a;
+    return result(this, path? resolvePath(path, a) : a);
   };
 
   //@deprecated
@@ -584,13 +647,28 @@ var Match = (function(_){
 
   proto.get = function(path){
     var res;
-    return (res = this.capture(path)) !== undefined ? res :
-      (res  = this.assignment(path)) !== undefined ? res :
+    return (res = this.cap(path)) !== undefined ? res :
+      (res  = this.atm(path)) !== undefined ? res :
       (res = (path[0]==='$'? this[path.slice(1)] : this[path])) !== undefined? res :
       this[path];
   } ;
 
-  proto.toString = function(){ return this._match[0]; };
+  proto.toString = function(){
+    return this._match[0];
+  };
+
+  proto.toJSON = function(){
+    var captures;
+    //if(this._pseudo) return this.toString();
+    //captures = _.chain([_.keys(this._exp.indices.name),_.keys(this._exp.indices.path)]).flatten().unique().value();
+    return this.pseudo? this.toString() : {
+      match: this._match,
+      index: this.index
+      //,input: this.input
+      //,captures: _.object(captures, this.capture(captures)),
+      //,attachment: this.getAssignments()
+    };
+  };
 
   proto.getAssignments = function(){
     if(!this._assignments)

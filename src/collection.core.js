@@ -46,7 +46,8 @@ var Collection = (function(_){
       parent = protos.prototype || protos,
       bind = statics.bind || _.functions(protos),
       c = s.constructor || function(){},
-      constructor = function(){
+      constructor = function(list){
+        if(!(this instanceof constructor)) return new constructor(list);
         Collection.apply(this, arguments);
         c.apply(this, arguments);
       },

@@ -44,7 +44,7 @@ var
   MARKER = new RegExp('\\$(' + PATH + '|[\\d&])', 'g'),
   DEBUG_MODE = true,
   SPLITTER = /,|\s+/,
-  PARENTHESIS = /(\\\(|\(\?[:=!])|\((?:#\w+:)?/g,
+  PARENTHESIS = /(\\\(|\(\?[:=!])|\((?:#\w+:)?/g, // matches '\(', '(?:', '(?=', '(?!' or '(#XXX:'
 
   BREAK = {},
   SKIP = {};

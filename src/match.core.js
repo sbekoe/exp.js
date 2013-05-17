@@ -61,6 +61,7 @@ var Match = (function(_){
     this.length = match.length;
     this.lastRange = exp.lastRange;
     this.range = [match.index, exp.lastIndex];
+    this.pseudo = !!match.pseudo;
 
     this["&"] = match [0]; // matched substring
     this["`"] = this.input.slice(0, this.index); // preceding string
@@ -89,7 +90,7 @@ var Match = (function(_){
 
   proto.atm = proto.attachment = function(path){
     var a = this.getAssignments();
-    return path? resolvePath(path, a) : a;
+    return result(this, path? resolvePath(path, a) : a);
   };
 
   //@deprecated
@@ -97,13 +98,28 @@ var Match = (function(_){
 
   proto.get = function(path){
     var res;
-    return (res = this.capture(path)) !== undefined ? res :
-      (res  = this.assignment(path)) !== undefined ? res :
+    return (res = this.cap(path)) !== undefined ? res :
+      (res  = this.atm(path)) !== undefined ? res :
       (res = (path[0]==='$$'? this[path.slice(1)] : this[path])) !== undefined? res :
       this[path];
   } ;
 
-  proto.toString = function(){ return this._match[0]; };
+  proto.toString = function(){
+    return this._match[0];
+  };
+
+  proto.toJSON = function(){
+    var captures;
+    //if(this._pseudo) return this.toString();
+    //captures = _.chain([_.keys(this._exp.indices.name),_.keys(this._exp.indices.path)]).flatten().unique().value();
+    return this.pseudo? this.toString() : {
+      match: this._match,
+      index: this.index
+      //,input: this.input
+      //,captures: _.object(captures, this.capture(captures)),
+      //,attachment: this.getAssignments()
+    };
+  };
 
   proto.getAssignments = function(){
     if(!this._assignments)
