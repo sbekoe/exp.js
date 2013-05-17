@@ -1,4 +1,4 @@
-/*! exp.js - v0.2.1 - 2013-05-16
+/*! exp.js - v0.2.2 - 2013-05-17
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
 (function (root, factory) {
@@ -733,7 +733,7 @@ var Match = (function(_){
   return Match;
 })(_);
 
-Exp.VERSION = '0.2.1';
+Exp.VERSION = '0.2.2';
 
 Exp.Collection = Collection;
 Exp.Match = Match;
