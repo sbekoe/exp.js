@@ -1,4 +1,4 @@
-/*! exp.js - v0.2.2 - 2013-05-17
+/*! exp.js - v0.2.2 - 2013-05-20
  * https://github.com/sbekoe/exp.js
  * Copyright (c) 2013 Simon Bekoe; Licensed MIT */
 (function (root, factory) {
@@ -133,6 +133,7 @@ var Exp = (function(){
 
   Exp.prototype = {
     initialize: function(exp, options){
+      var _this = this;
       var settings = options || exp || {};
 
       // initial properties
@@ -142,11 +143,14 @@ var Exp = (function(){
       this.multiline = exp.multiline || settings.multiline;
 
       this.options = _.extend({}, defaults, options, exp);
+
       _.extend(this, _.pick(this.options, specialOpt));
       this.flags = settings.flags || '';
       this.wildcards = settings.wildcards || {};
 
       this.assignments = settings.assignments || {};
+
+      this.enclose(modes);
 
       // runtime properties
       this.zero(settings.lastIndex);
@@ -363,6 +367,13 @@ var Exp = (function(){
       return this._captures[i].e;
     },
 
+    enclose: function(){
+      _.each(arguments, function(closure){
+        if(_.isFunction(closure)) closure.call(this, this.options);
+      },this);
+      return this;
+    },
+
 
 
     SKIP: SKIP,
@@ -441,7 +452,13 @@ var Exp = (function(){
           return map.call(exp, match, tokens);
         });
       
-      if (lastIndex < string.length) tokens.push(tokens[tokens.length] = string.slice(lastIndex));
+      // if (lastIndex < string.length) tokens.push(tokens[tokens.length] = string.slice(lastIndex));
+      if (lastIndex < string.length) tokens.push(tokens[tokens.length] = map.call(exp, pseudoMatch({
+        0: string.slice(lastIndex),
+        index: lastIndex,
+        input: string,
+        line: line
+      },exp), tokens));
 
       return tokens;
     },
@@ -482,6 +499,35 @@ var Exp = (function(){
       );
       
       return exp instanceof Exp? Match(match, exp) : match;
+    };
+
+    // Closures
+    var mode = function(){
+
+    };
+
+    var modes = function(settings){
+      //privates
+      var
+        _this = this,
+        mode = settings.mode || 'default',
+        modes = settings.modes || {},
+        attr = ['_exp','_captures', 'indices', 'assignments', 'offset', 'source'];
+
+      _.each(modes,function(mode,name){
+        var m =_.extend(_.pick(_this,['global', 'multiline', 'ignoreCase']),mode,{
+          wildcards: _.extend(mode.wildcards||{}, _this.wildcards)
+        });
+        modes[name] = _.pick(new Exp(m), attr);
+      });
+
+      modes['default'] = _.pick(this, attr);
+
+      this.mode = function(m){
+        if(!arguments.length) return mode;
+        if(modes[m]) _.extend(this,modes[mode = m]);
+        return this;
+      };
     };
 
     //dies ist ein test

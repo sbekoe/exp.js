@@ -394,5 +394,37 @@ test('repetitions', function(){
   ok(m.assignment('attr') == 'val');
 });
 
+
+test('mode swithcer', function(){
+
+  var e = Exp({
+    source:'(#foo:foo)(#bar:bar(#baz:baz))',
+    modes:{
+      test:{
+        source:'(#baz:baz)'
+      }
+    },
+    global:true
+  });
+
+  ok(
+    e.mode()==='default' &&
+    e.test('foobarbaz'),
+    'exp is in default mode after instanciation'
+  );
+
+  e.mode('test');
+  ok(
+    e.mode() === 'test' &&
+    e.source === '(#baz:baz)' &&
+    e.test('baz') &&
+    e.exec('foobarbaz').cap('baz') === 'baz',
+    'switch to custom if it exist'
+  );
+
+  e.mode('undefinedMode');
+  equal(e.mode(), 'test', 'stay in last mode switch to undefined mode');
+
+});
 //test('escaping Exp.esc',function(){});
 //test('expanding external source string Exp.expand',function(){});

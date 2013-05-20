@@ -1,7 +1,7 @@
 {
   "name": "exp",
   "title": "exp.js",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "RegExp library based on underscore js",
   "homepage": "https://github.com/sbekoe/exp.js",
   "author": {
